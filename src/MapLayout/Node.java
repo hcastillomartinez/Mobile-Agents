@@ -45,4 +45,12 @@ public class Node {
      * @return returnPaths nodes
      */
     public LinkedList<Node> getReturnPaths() { return this.returnPaths; }
+
+
+    /**
+     * Walking the map
+     */
+    public void walk() {
+
+    }
 }
