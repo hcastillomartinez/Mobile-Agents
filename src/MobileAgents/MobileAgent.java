@@ -2,7 +2,7 @@ package MobileAgents;
 
 import java.util.concurrent.BlockingQueue;
 
-public class MobileAgent implements SensorObject {
+public class MobileAgent implements SensorObject, Runnable {
     
     BlockingQueue<String> messages;
     
@@ -18,7 +18,7 @@ public class MobileAgent implements SensorObject {
      * Creating a new agent if the node below is heated.
      * @return alertAgent
      */
-    private MobileAgent clone() {
+    protected MobileAgent clone() {
         return new MobileAgent(this.messages);
     }
 
@@ -34,5 +34,10 @@ public class MobileAgent implements SensorObject {
     @Override
     public String getMessage(SensorObject sensorObject) {
         return null;
+    }
+
+    @Override
+    public void run() {
+    
     }
 }

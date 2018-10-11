@@ -7,7 +7,7 @@ import java.util.LinkedList;
  * substation in relation to this node.
  * Danan High, 10/5/2018
  */
-public class Node {
+public class Node implements SensorObject, Runnable {
     private int level;
     private LinkedList<Node> edges;
     private LinkedList<Node> returnPaths;
@@ -73,5 +73,20 @@ public class Node {
      */
     public void walk() {
 
+    }
+
+    @Override
+    public String sendMessage() {
+        return null;
+    }
+    
+    @Override
+    public String getMessage(SensorObject sensorObject) {
+        return null;
+    }
+
+    @Override
+    public void run() {
+    
     }
 }
