@@ -1,15 +1,26 @@
-package MapLayout;
+package MapLayoutTest;
 
+import MobileAgents.Node;
+
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
+
+/**
+ * LayoutMaker.java creates the random map to be used to check and run the
+ * mobile agents program.
+ * Danan High, 10/5/2018
+ */
 public class LayoutMaker {
 
     private LinkedList<Node> list;
+    private HashMap<Node, LinkedList<Node>> map;
     private int numberOfNodes;
 
     public LayoutMaker(int numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
+        this.map = new HashMap<>();
         this.list = new LinkedList<>();
         makeLayout();
     }
@@ -24,7 +35,26 @@ public class LayoutMaker {
         int randHolder;
 
         for (int i = 0; i < numberOfNodes; i++) {
-            listOfNodes.add(new Node((i % 3) + 1));
+            if (i == 0) {
+                listOfNodes.add(new Node((i % 3) + 1,
+                                         true,
+                                         false,
+                                         false,
+                                         false));
+
+            }else if (i == 1) {
+                listOfNodes.add(new Node((i % 3) + 1,
+                                         false,
+                                         false,
+                                         true,
+                                         true));
+            } else {
+                listOfNodes.add(new Node((i % 3) + 1,
+                                         false,
+                                         false,
+                                         false,
+                                         false));
+            }
         }
 
         for (Node n: listOfNodes) {
@@ -48,7 +78,9 @@ public class LayoutMaker {
         }
 
         for (Node n: listOfNodes) {
-            System.out.println(n + " = " + n.getEdges());
+            if (!map.containsKey(n)) {
+                map.put(n, n.getEdges());
+            }
         }
     }
 
@@ -57,6 +89,6 @@ public class LayoutMaker {
      * Function to return the list of the map that was made.
      * @return list of the map
      */
-    public LinkedList<Node> getLayout() { return this.list; }
+    public HashMap<Node, LinkedList<Node>> getLayout() { return this.map; }
 
 }
