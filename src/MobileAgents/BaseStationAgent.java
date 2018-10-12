@@ -44,7 +44,7 @@ public class BaseStationAgent extends Node {
     }
     
     @Override
-    public void getMessage() {
+    public void getMessages() {
     
     }
     

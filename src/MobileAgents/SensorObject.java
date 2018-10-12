@@ -16,5 +16,5 @@ public interface SensorObject {
      * Getting the next message in the queue.
      * @return message
      */
-    void getMessage();
+    void getMessages();
 }

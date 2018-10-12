@@ -2,6 +2,7 @@ package MobileAgents;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
@@ -17,6 +18,7 @@ public class Node implements SensorObject, Runnable {
     private BlockingQueue<Message> queue;
     private String state;
     private List<Node> neighbors;
+    private MobileAgent agent;
     
     /**
      * Constructor for the Node class.
@@ -34,6 +36,7 @@ public class Node implements SensorObject, Runnable {
         this.coordinate = coordinate;
         this.state = state;
         this.name = name;
+        this.agent = null;
     }
     
     /**
@@ -59,12 +62,24 @@ public class Node implements SensorObject, Runnable {
      * @return point location of the node
      */
     public Point getCoordinate() { return this.coordinate; }
+    
+    /**
+     * Returning the status of whether the node has an agent present
+     * @return agentPresent, true if there is an agent and false otherwise
+     */
+    private boolean agentPresent() {
+        if (this.agent == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     /**
      * Sending a message to update/perform a task.
      */
     @Override
-    public void sendMessage() {
+    synchronized public void sendMessage() {
         try {
             // take a look here for how to store messages.
             // Maybe create a map that has all of the nodes and their associated
@@ -80,7 +95,7 @@ public class Node implements SensorObject, Runnable {
      * Getting a message from the queue to perform a task.
      */
     @Override
-    public void getMessage() {
+    synchronized public void getMessages() {
         try {
             Message tempMessage = this.queue.take();
             // take a look back here
