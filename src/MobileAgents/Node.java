@@ -1,6 +1,9 @@
 package MobileAgents;
 
-import java.util.LinkedList;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * MobileAgents.Node.java stores all of the surrounding edges and paths back to the
@@ -8,85 +11,137 @@ import java.util.LinkedList;
  * Danan High, 10/5/2018
  */
 public class Node implements SensorObject, Runnable {
-    private int level;
-    private LinkedList<Node> edges;
-    private LinkedList<Node> returnPaths;
-    private boolean onFire, heatedUp, base, agentPresent;
-    private Node agent;
-
-
+    
+    private String name;
+    private Point coordinate;
+    private BlockingQueue<Message> queue;
+    private String state;
+    private List<Node> neighbors;
+    
     /**
-     * Constructor for the MobileAgents.Node class. Class makes a new list of edges that
-     * contains the neighboring nodes, a new list of nodes that lead to a path
-     * back to the substation.
-     * @param level
+     * Constructor for the Node class.
+     * @param queue, concurrent queue for storing events
+     * @param coordinate, location of the node
+     * @param state, heat status of the node
+     * @param name, name of the node
      */
-    public Node(int level, boolean onFire, boolean heatedUp,
-                boolean base, boolean agentPresent) {
-        this.onFire = onFire;
-        this.heatedUp = heatedUp;
-        this.base = base;
-        this.agentPresent = agentPresent;
-        this.level = level;
-        this.agent = null;
-        this.edges = new LinkedList<>();
-        this.returnPaths = new LinkedList<>();
-    }
-
-
-    /**
-     * Returning the edges of this node.
-     * @return edges of the node
-     */
-    public LinkedList<Node> getEdges() { return this.edges; }
-
-
-    /**
-     * Returning the level of the current node.
-     * @return level of the node
-     */
-    public int getLevel() { return this.level; }
-
-
-    /**
-     * Returning the list of the return path nodes.
-     * @return returnPaths nodes
-     */
-    public LinkedList<Node> getReturnPaths() { return this.returnPaths; }
-
-
-    /**
-     * Returning if the node is on fire or not.
-     * @return onFire status, true if on fire, and false otherwise
-     */
-    public boolean isOnFire() { return this.onFire; }
-
-
-    /**
-     * Returning if the node is heated or not.
-     * @return heatedUp status, true if heated up, and false otherwise
-     */
-    public boolean isHeatedUp() { return heatedUp; }
-
-    /**
-     * Walking the map
-     */
-    public void walk() {
-
-    }
-
-    @Override
-    public String sendMessage() {
-        return null;
+    public Node(BlockingQueue<Message> queue,
+                Point coordinate,
+                String state,
+                String name) {
+        this.neighbors = new ArrayList<>();
+        this.queue = queue;
+        this.coordinate = coordinate;
+        this.state = state;
+        this.name = name;
     }
     
+    /**
+     * Returning the name of the node.
+     * @return name of the node
+     */
+    public String getName() { return this.name; }
+
+    /**
+     * Returning the list of the neighbor nodes.
+     * @return neighbor list
+     */
+    public List<Node> getNeighbors() { return this.neighbors; }
+
+    /**
+     * Returning the status of the node.
+     * @return status, heat, of the node
+     */
+    public String getState() { return this.state; }
+    
+    /**
+     * Returning the location of the node in the graph.
+     * @return point location of the node
+     */
+    public Point getCoordinate() { return this.coordinate; }
+
+    /**
+     * Sending a message to update/perform a task.
+     */
     @Override
-    public String getMessage(SensorObject sensorObject) {
-        return null;
+    public void sendMessage() {
+        try {
+            // take a look here for how to store messages.
+            // Maybe create a map that has all of the nodes and their associated
+            // tasks that they are performing in a list?
+            //      (key = SensorObj, value = list of messages).
+            // will put the SensorObj in the BlockingQueue to take turns?
+        } catch(InterruptedException ie) {
+            ie.printStackTrace();
+        }
+    }
+    
+    /**
+     * Getting a message from the queue to perform a task.
+     */
+    @Override
+    public void getMessage() {
+        try {
+            Message tempMessage = this.queue.take();
+            // take a look back here
+        } catch(InterruptedException ie) {
+            ie.printStackTrace();
+        }
     }
 
+    /**
+     * Performing a task on this specific thread.
+     */
     @Override
     public void run() {
     
     }
 }
+
+
+
+/*
+Types of messages to be sent:
+    - for node to agent
+        - if the node has an agent
+        - state of heat on the node
+        
+    - for node to node
+        - tell BaseNode to add an agent
+        - tell neighbors to create agents
+        
+    - for BaseNode from node
+        - add new agent to the list of agents
+        - update location of the walking agent
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

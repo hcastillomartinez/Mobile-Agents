@@ -27,13 +27,13 @@ public class MobileAgent implements SensorObject, Runnable {
      *
      */
     @Override
-    public String sendMessage() {
-        return null;
+    public void sendMessage() {
+    
     }
     
     @Override
-    public String getMessage(SensorObject sensorObject) {
-        return null;
+    public void getMessage() {
+    
     }
 
     @Override
