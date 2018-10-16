@@ -18,6 +18,7 @@ import java.util.concurrent.BlockingQueue;
  */
 public class GraphReader {
     
+    private boolean fireStarted = false, baseStationAssigned = false;
     private File file;
     private HashMap<Node, ArrayList<Node>> graph;
     private BlockingQueue<Message> messages;
@@ -56,12 +57,14 @@ public class GraphReader {
                     endY = scanner.nextInt();
                 }
     
-                if (nextLine.equalsIgnoreCase("station")) {
+                if (nextLine.equalsIgnoreCase("station") &&
+                    !this.baseStationAssigned) {
                     stationX = x;
                     stationY = y;
                 } else if (nextLine.equalsIgnoreCase("node")) {
                     placeNodeInGraph(makeNodeName(x, y), x, y);
-                } else if (nextLine.equalsIgnoreCase("fire")) {
+                } else if (nextLine.equalsIgnoreCase("fire") &&
+                    !this.fireStarted) {
                     fireX = x;
                     fireY = y;
                 } else if (nextLine.equalsIgnoreCase("edge")) {
