@@ -1,7 +1,5 @@
 package MobileAgents;
 
-import sun.management.Agent;
-
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,16 +36,25 @@ public class BaseStationAgent extends Node {
         this.agentList = new ArrayList<>();
     }
     
+    /**
+     * Overriding the method to send specific messages based off of this node.
+     */
     @Override
     public void sendMessage() {
     
     }
     
+    /**
+     * Getting a message from the queue.
+     */
     @Override
     public void getMessages() {
     
     }
     
+    /**
+     * Overriding run to perform specific tasks for this node.
+     */
     @Override
     public void run() {
     
