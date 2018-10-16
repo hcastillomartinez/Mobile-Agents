@@ -61,12 +61,14 @@ public class GraphReader {
                     !this.baseStationAssigned) {
                     stationX = x;
                     stationY = y;
+                    this.baseStationAssigned = true;
                 } else if (nextLine.equalsIgnoreCase("node")) {
                     placeNodeInGraph(makeNodeName(x, y), x, y);
                 } else if (nextLine.equalsIgnoreCase("fire") &&
                     !this.fireStarted) {
                     fireX = x;
                     fireY = y;
+                    this.fireStarted = true;
                 } else if (nextLine.equalsIgnoreCase("edge")) {
                     beginNode.push(makeNodeName(x, y));
                     endNode.push(makeNodeName(endX, endY));
