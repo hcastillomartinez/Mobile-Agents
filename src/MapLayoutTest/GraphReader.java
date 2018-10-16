@@ -13,7 +13,7 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * GraphReader.java is the class that reads in the file that contains the
- * graph layout.
+ * graph layout. Class assumes that there is only one station and one fire.
  * Danan High, 10/15/2018
  */
 public class GraphReader {
