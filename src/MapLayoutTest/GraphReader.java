@@ -68,7 +68,8 @@ public class GraphReader {
                         place++;
                     }
                 }
-                
+                place = 0;
+    
                 if (nodeName.equalsIgnoreCase("station")) {
                     stationX = x;
                     stationY = y;
@@ -81,7 +82,6 @@ public class GraphReader {
                     beginNode.push(makeNodeName(x, y));
                     endNode.push(makeNodeName(x, y));
                 }
-                place = 0;
                 nodeName = "";
             }
             
