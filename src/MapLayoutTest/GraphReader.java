@@ -42,7 +42,7 @@ public class GraphReader {
     private void readInGraph() {
         Scanner scanner;
         String nextLine;
-        int x = 0, y = 0, endX = 0, endY = 0, stationX = 0, stationY = 0,
+        int x, y, endX = 0, endY = 0, stationX = 0, stationY = 0,
             fireX = 0, fireY = 0;
         
         try {
@@ -52,7 +52,7 @@ public class GraphReader {
                 x = scanner.nextInt();
                 y = scanner.nextInt();
                
-                while (scanner.hasNextInt()) {
+                if (scanner.hasNextInt()) {
                     endX = scanner.nextInt();
                     endY = scanner.nextInt();
                 }
@@ -75,17 +75,8 @@ public class GraphReader {
                 }
             }
             
-            for (Node n: this.graph.keySet()) {
-                if (n.getName().equalsIgnoreCase(makeNodeName(stationX,
-                                                              stationY))) {
-                    n.setBaseStation();
-                }
-                
-                if (n.getName().equalsIgnoreCase(makeNodeName(fireX,
-                                                              fireY))) {
-                    n.setState("red");
-                }
-            }
+            // setting the starting base station node and the fire node
+            setStartingNodes(stationX, stationY, fireX, fireY);
             
             for (int i = 0; i < beginNode.size(); i++) {
                 placeEdgesInGraph(beginNode.get(i), endNode.get(i));
@@ -98,8 +89,24 @@ public class GraphReader {
     }
     
     /**
-     * Setting the nodes to their default states
+     * Setting the fire and base station nodes
      */
+    private void setStartingNodes(int baseX,
+                                  int baseY,
+                                  int fireStartX,
+                                  int fireStartY) {
+        for (Node n: this.graph.keySet()) {
+            if (n.getName().equalsIgnoreCase(makeNodeName(baseX,
+                                                          baseY))) {
+                n.setBaseStation();
+            }
+        
+            if (n.getName().equalsIgnoreCase(makeNodeName(fireStartX,
+                                                          fireStartY))) {
+                n.setState("red");
+            }
+        }
+    }
     
     /**
      * Checking if the map contains the nodes, and if not adding it to the
