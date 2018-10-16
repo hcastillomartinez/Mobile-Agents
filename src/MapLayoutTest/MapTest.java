@@ -4,6 +4,7 @@ import MobileAgents.Message;
 import MobileAgents.Node;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -21,14 +22,21 @@ public class MapTest {
 
     public static void main(String[] args) {
         BlockingQueue<Message> queue = new ArrayBlockingQueue<Message>(1);
+        
         String fileName = System.getProperty("user.dir") +
             "/src/MapLayoutTest/GraphTest";
-        GraphReader gr = new GraphReader(new File(fileName), queue);
-        HashMap<Node, LinkedList<Node>> map = gr.getGraph();
         
-        for (Map.Entry<Node, LinkedList<Node>> mapTwo: map.entrySet()) {
-            System.out.println("key = " + mapTwo.getKey() + ", values" +
-                                   mapTwo.getValue());
+        GraphReader gr = new GraphReader(new File(fileName), queue);
+        
+        HashMap<Node, ArrayList<Node>> map = gr.getGraph();
+        
+        for (Map.Entry<Node, ArrayList<Node>> mapTwo: map.entrySet()) {
+            System.out.print("key = " + mapTwo.getKey().getName() + ", values" +
+                                 " = [");
+            for (Node n: mapTwo.getValue()) {
+                System.out.print(n.getName() + "   ");
+            }
+            System.out.println("]");
         }
     }
 }

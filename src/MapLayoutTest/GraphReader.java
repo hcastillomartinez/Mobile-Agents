@@ -3,9 +3,9 @@ package MapLayoutTest;
 import MobileAgents.Message;
 import MobileAgents.Node;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -19,7 +19,7 @@ import java.util.concurrent.BlockingQueue;
 public class GraphReader {
     
     private File file;
-    private HashMap<Node, LinkedList<Node>> graph;
+    private HashMap<Node, ArrayList<Node>> graph;
     private BlockingQueue<Message> messages;
     private LinkedList<String> beginNode = new LinkedList<>();
     private LinkedList<String> endNode = new LinkedList<>();
@@ -40,49 +40,34 @@ public class GraphReader {
      */
     private void readInGraph() {
         Scanner scanner;
-        String nodeName = "";
         String nextLine;
-        int x = 0, y = 0, endX = 0, endY = 0, place = 0, stationX = 0,
-            stationY = 0, fireX = 0, fireY = 0;
+        int x = 0, y = 0, endX = 0, endY = 0, stationX = 0, stationY = 0,
+            fireX = 0, fireY = 0;
+        
         try {
             scanner = new Scanner(this.file);
             while (scanner.hasNext()) {
                 nextLine = scanner.next();
-                for (int i = 0; i < nextLine.length(); i++) {
-                    if (Character.isAlphabetic(nextLine.charAt(i))) {
-                        nodeName += nextLine.charAt(i);
-                    } else if (Character.isDigit(nextLine.charAt(i))) {
-                        if (place == 0) {
-                            x = Integer.parseInt(makeString(nextLine
-                                                                .charAt(i)));
-                        } else if (place == 1) {
-                            y = Integer.parseInt(makeString(nextLine
-                                                                .charAt(i)));
-                        } else if (place == 2) {
-                            endX = Integer.parseInt(makeString(nextLine
-                                                                   .charAt(i)));
-                        } else {
-                            endY = Integer.parseInt(makeString(nextLine
-                                                                   .charAt(i)));
-                        }
-                        place++;
-                    }
+                x = scanner.nextInt();
+                y = scanner.nextInt();
+               
+                while (scanner.hasNextInt()) {
+                    endX = scanner.nextInt();
+                    endY = scanner.nextInt();
                 }
-                place = 0;
     
-                if (nodeName.equalsIgnoreCase("station")) {
+                if (nextLine.equalsIgnoreCase("station")) {
                     stationX = x;
                     stationY = y;
-                } else if (nodeName.equalsIgnoreCase("node")) {
+                } else if (nextLine.equalsIgnoreCase("node")) {
                     placeNodeInGraph(makeNodeName(x, y), x, y);
-                } else if (nodeName.equalsIgnoreCase("fire")) {
+                } else if (nextLine.equalsIgnoreCase("fire")) {
                     fireX = x;
                     fireY = y;
-                } else if (nodeName.equalsIgnoreCase("edge")) {
+                } else if (nextLine.equalsIgnoreCase("edge")) {
                     beginNode.push(makeNodeName(x, y));
-                    endNode.push(makeNodeName(x, y));
+                    endNode.push(makeNodeName(endX, endY));
                 }
-                nodeName = "";
             }
             
             for (Node n: this.graph.keySet()) {
@@ -100,11 +85,16 @@ public class GraphReader {
             for (int i = 0; i < beginNode.size(); i++) {
                 placeEdgesInGraph(beginNode.get(i), endNode.get(i));
             }
+            
             scanner.close();
         } catch (FileNotFoundException fe) {
             fe.printStackTrace();
         }
     }
+    
+    /**
+     * Setting the nodes to their default states
+     */
     
     /**
      * Checking if the map contains the nodes, and if not adding it to the
@@ -124,43 +114,36 @@ public class GraphReader {
             this.graph.put(new Node(this.messages,
                                     "green",
                                     makeNodeName(x, y)),
-                           new LinkedList<>());
+                           new ArrayList<>());
         }
     }
     
     /**
      * Placing the edges in the graph.
      */
-    private void placeEdgesInGraph(String beginNode, String endNode) {
+    private void placeEdgesInGraph(String beginNodeName, String endNodeName) {
         Node startNode = null, connectingNode = null;
         for (Node n: this.graph.keySet()) {
-            if (n.getName().equalsIgnoreCase(beginNode)) {
+            if (n.getName().equalsIgnoreCase(beginNodeName)) {
                 startNode = n;
             }
             
-            if (n.getName().equalsIgnoreCase(endNode)) {
+            if (n.getName().equalsIgnoreCase(endNodeName)) {
                 connectingNode = n;
             }
         }
         
-        if (!connectingNode.getNeighbors().isEmpty()) {
+        if (startNode != null && connectingNode != null) {
             if (!startNode.getNeighbors().contains(connectingNode)) {
                 startNode.getNeighbors().add(connectingNode);
+                this.graph.get(startNode).add(connectingNode);
             }
-        }
-        
-        if (!startNode.getNeighbors().isEmpty()) {
+            
             if (!connectingNode.getNeighbors().contains(startNode)) {
                 connectingNode.getNeighbors().add(startNode);
+                this.graph.get(connectingNode).add(startNode);
             }
         }
-    }
-    
-    /**
-     * Making a string to parse the integer from the line of characters.
-     */
-    private String makeString(char c) {
-        return "" + c + "";
     }
     
     /**
@@ -174,7 +157,6 @@ public class GraphReader {
      * Returning the built graph
      * @return graph of the layout
      */
-    public HashMap<Node, LinkedList<Node>> getGraph() {
-        System.out.println("here");
+    public HashMap<Node, ArrayList<Node>> getGraph() {
         return this.graph; }
 }
