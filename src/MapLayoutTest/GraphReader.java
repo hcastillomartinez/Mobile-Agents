@@ -10,10 +10,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * GraphReader.java is the class that reads in the file that contains the
- * graph layout. Class assumes that there is only one station and one fire.
+ * graph layout. Class looks for only one station and one fire.
  * Danan High, 10/15/2018
  */
 public class GraphReader {
@@ -21,17 +22,15 @@ public class GraphReader {
     private boolean fireStarted = false, baseStationAssigned = false;
     private File file;
     private HashMap<Node, ArrayList<Node>> graph;
-    private BlockingQueue<Message> messages;
     private LinkedList<String> beginNode = new LinkedList<>();
     private LinkedList<String> endNode = new LinkedList<>();
     
     /**
-     * Constructor for the GraphReader class
+     * Constructor for the GraphReader class.
      * @param file, name of the file
      */
-    public GraphReader(File file, BlockingQueue<Message> messages) {
+    public GraphReader(File file) {
         this.file = file;
-        this.messages = messages;
         this.graph = new HashMap<>();
         readInGraph();
     }
@@ -42,46 +41,47 @@ public class GraphReader {
     private void readInGraph() {
         Scanner scanner;
         String nextLine;
-        int x, y, endX = 0, endY = 0, stationX = 0, stationY = 0,
+        int nodeX, nodeY, edgeX = 0, edgeY = 0, stationX = 0, stationY = 0,
             fireX = 0, fireY = 0;
         
         try {
             scanner = new Scanner(this.file);
             while (scanner.hasNext()) {
                 nextLine = scanner.next();
-                x = scanner.nextInt();
-                y = scanner.nextInt();
+                nodeX = scanner.nextInt();
+                nodeY = scanner.nextInt();
                
+                // checking for edge ints
                 if (scanner.hasNextInt()) {
-                    endX = scanner.nextInt();
-                    endY = scanner.nextInt();
+                    edgeX = scanner.nextInt();
+                    edgeY = scanner.nextInt();
                 }
     
+                // checking next line string
                 if (nextLine.equalsIgnoreCase("station") &&
                     !this.baseStationAssigned) {
-                    stationX = x;
-                    stationY = y;
+                    stationX = nodeX;
+                    stationY = nodeY;
                     this.baseStationAssigned = true;
                 } else if (nextLine.equalsIgnoreCase("node")) {
-                    placeNodeInGraph(makeNodeName(x, y), x, y);
+                    placeNodeInGraph(makeNodeName(nodeX, nodeY));
                 } else if (nextLine.equalsIgnoreCase("fire") &&
                     !this.fireStarted) {
-                    fireX = x;
-                    fireY = y;
+                    fireX = nodeX;
+                    fireY = nodeY;
                     this.fireStarted = true;
                 } else if (nextLine.equalsIgnoreCase("edge")) {
-                    beginNode.push(makeNodeName(x, y));
-                    endNode.push(makeNodeName(endX, endY));
+                    beginNode.push(makeNodeName(nodeX, nodeY));
+                    endNode.push(makeNodeName(edgeX, edgeY));
                 }
             }
-            
-            // setting the starting base station node and the fire node
-            setStartingNodes(stationX, stationY, fireX, fireY);
             
             for (int i = 0; i < beginNode.size(); i++) {
                 placeEdgesInGraph(beginNode.get(i), endNode.get(i));
             }
-            
+    
+            setStartingNodes(stationX, stationY, fireX, fireY);
+    
             scanner.close();
         } catch (FileNotFoundException fe) {
             fe.printStackTrace();
@@ -89,7 +89,7 @@ public class GraphReader {
     }
     
     /**
-     * Setting the fire and base station nodes
+     * Setting the fire and base station nodes.
      */
     private void setStartingNodes(int baseX,
                                   int baseY,
@@ -104,6 +104,9 @@ public class GraphReader {
             if (n.getName().equalsIgnoreCase(makeNodeName(fireStartX,
                                                           fireStartY))) {
                 n.setState("red");
+                for (Node node: n.getNeighbors()) {
+                    node.setState("yellow");
+                }
             }
         }
     }
@@ -112,9 +115,7 @@ public class GraphReader {
      * Checking if the map contains the nodes, and if not adding it to the
      * graph.
      */
-    private void placeNodeInGraph(String name,
-                                  int x,
-                                  int y) {
+    private void placeNodeInGraph(String name) {
         boolean inKeys = false;
         for (Node n: this.graph.keySet()) {
             if (n.getName().equalsIgnoreCase(name)) {
@@ -123,9 +124,9 @@ public class GraphReader {
         }
         
         if (!inKeys) {
-            this.graph.put(new Node(this.messages,
+            this.graph.put(new Node(new LinkedBlockingQueue<>(),
                                     "green",
-                                    makeNodeName(x, y)),
+                                    name),
                            new ArrayList<>());
         }
     }
@@ -159,16 +160,15 @@ public class GraphReader {
     }
     
     /**
-     * Making a string to make the name for the nodes
+     * Making a string to make the name for the nodes.
      */
     private String makeNodeName(int xSpot, int ySpot) {
         return "" + xSpot + " " + ySpot + "";
     }
     
     /**
-     * Returning the built graph
+     * Returning the built graph.
      * @return graph of the layout
      */
-    public HashMap<Node, ArrayList<Node>> getGraph() {
-        return this.graph; }
+    public HashMap<Node, ArrayList<Node>> getGraph() { return this.graph; }
 }

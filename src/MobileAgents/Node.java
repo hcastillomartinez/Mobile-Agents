@@ -62,14 +62,27 @@ public class Node implements SensorObject, Runnable {
     }
     
     /**
+     * Returning if the current node is the base station
+     * @return baseStation status
+     */
+    public boolean isBaseStation() { return baseStation; }
+
+    /**
      * Setting the state of the node.
      */
     public void setState(String stateSet) {
         this.state = stateSet;
     }
+
+    /**
+     * Returning the agent on the node.
+     */
+    public void setAgent(MobileAgent mobileAgent) {
+        this.agent = mobileAgent;
+    }
     
     /**
-     * Returning the status of whether the node has an agent present
+     * Returning the status of whether the node has an agent present.
      * @return agentPresent, true if there is an agent and false otherwise
      */
     private boolean agentPresent() {
@@ -79,25 +92,57 @@ public class Node implements SensorObject, Runnable {
             return true;
         }
     }
+    
+    /**
+     * Creating a message to add to this node
+     */
+    public void createMessage(Message message) {
+        try {
+            this.queue.put(message);
+        } catch(InterruptedException ie) {
+            ie.printStackTrace();
+        }
+    }
 
     /**
      * Sending a message to update/perform a task.
      */
     @Override
-    synchronized public void sendMessage() {
-    
+    public synchronized void sendMessage() {
+        try {
+            Thread.sleep(0);
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        }
     }
     
     /**
      * Getting a message from the queue to perform a task.
      */
     @Override
-    synchronized public void getMessages() {
+    public synchronized void getMessages() {
         try {
-            Message tempMessage = this.queue.take();
-            // take a look back here
-        } catch(InterruptedException ie) {
+            Message message = this.queue.take();
+            analyzeMessage(message);
+        } catch (InterruptedException ie) {
             ie.printStackTrace();
+        }
+    }
+    
+    /**
+     * Analyzing the message from the queue.
+     */
+    private void analyzeMessage(Message m) {
+        if (m.getSender().getClass().equals(MobileAgent.class)) {
+            if (m.getDetailedMessage().equalsIgnoreCase("clone")) {
+                MobileAgent mobileAgent = (MobileAgent) m.getSender();
+                
+                for (Node n: this.neighbors) {
+                    if (!n.agentPresent()) {
+                        n.setAgent(mobileAgent.clone());
+                    }
+                }
+            }
         }
     }
 
@@ -106,7 +151,6 @@ public class Node implements SensorObject, Runnable {
      */
     @Override
     public void run() {
-        sendMessage();
         getMessages();
     }
 }
