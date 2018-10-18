@@ -117,7 +117,7 @@ public class Node implements SensorObject, Runnable {
      */
     public void createMessage(Message message) {
         try {
-            System.out.println(message.toString());
+            System.out.println("Producer: " + getName() + " = " + queue);
             this.queue.put(message);
         } catch(InterruptedException ie) {
             ie.printStackTrace();
@@ -142,6 +142,7 @@ public class Node implements SensorObject, Runnable {
     @Override
     public synchronized void getMessages() {
         try {
+            System.out.println("Consumer: " + getName() + " = " + queue);
             analyzeMessage(queue.take());
         } catch (InterruptedException ie) {
             ie.printStackTrace();
@@ -183,7 +184,6 @@ public class Node implements SensorObject, Runnable {
             if (isBaseStation()) {
                 if (!mobileAgents().contains(mobileAgent)) {
                     mobileAgents().add(mobileAgent);
-                    System.out.println("BaseStationList = " + mobileAgents());
                 }
             } else {
                 Node node = getLowestRankedNode(this.getNeighbors());
@@ -205,14 +205,15 @@ public class Node implements SensorObject, Runnable {
                 
                 System.out.println("-------------");
                 for (Node n: this.getNeighbors()) {
-                    System.out.println(n.getName());
                     if (!n.agentPresent()) {
                         n.setAgent(mobileAgent.clone());
                         Node lowerNode = getLowestRankedNode(n.getNeighbors());
-                        lowerNode.createMessage(new Message(n,
-                                                            lowerNode,
-                                                            n.getAgent(),
-                                                            "insert clone"));
+                        Message message = new Message(n,
+                                                      lowerNode,
+                                                      n.getAgent(),
+                                                      "insert clone");
+                        System.out.println(message.toString());
+                        lowerNode.createMessage(message);
                     }
                 }
             }
