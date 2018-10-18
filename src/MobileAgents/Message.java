@@ -9,6 +9,7 @@ public class Message {
     
     private SensorObject sender;
     private SensorObject receiver;
+    private MobileAgent clonedAgent;
     private String detailedMessage;
     
     /**
@@ -20,9 +21,11 @@ public class Message {
      */
     public Message(SensorObject sender,
                    SensorObject receiver,
+                   MobileAgent clonedAgent,
                    String detailedMessage) {
         this.sender = sender;
         this.receiver = receiver;
+        this.clonedAgent = clonedAgent;
         this.detailedMessage = detailedMessage;
     }
     
@@ -38,9 +41,7 @@ public class Message {
      * Returning the node who created the message.
      * @return sensorObject, who created the message
      */
-    public SensorObject getSender() {
-        return this.sender;
-    }
+    public SensorObject getSender() { return this.sender; }
 
     /**
      * Returning the node who gets the message.
@@ -49,4 +50,10 @@ public class Message {
     public SensorObject getReceiver() {
         return this.receiver;
     }
+    
+    /**
+     * Returning the agent from the message to clone
+     * @return clonedAgent to place at the baseStation
+     */
+    public MobileAgent getClonedAgent() { return clonedAgent; }
 }

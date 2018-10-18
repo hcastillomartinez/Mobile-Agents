@@ -1,5 +1,6 @@
 package MobileAgents;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
@@ -41,6 +42,12 @@ public class MobileAgent implements SensorObject, Runnable {
     private void getNodeStatus() {
         this.nodeStatus = this.currentNode.getState();
     }
+
+    /**
+     * Returning the id of the agent.
+     * @return id, unique id of the agent
+     */
+    public long getId() { return this.id; }
     
     /**
      * Walking the nodes in the graph.
@@ -49,20 +56,26 @@ public class MobileAgent implements SensorObject, Runnable {
         Random rand = new Random();
         List<Node> neighbors;
         while (true) {
-            try {
-                neighbors = this.currentNode.getNeighbors();
-                System.out.println(this.currentNode.getName() + " = curNode");
+            neighbors = this.currentNode.getNeighbors();
+            Node node = neighbors.get(rand.nextInt(neighbors.size()));
+            
+            if (!node.agentPresent()) {
                 this.currentNode = neighbors.get(rand.nextInt(neighbors.size()));
-                
-                if (this.currentNode.getState().equalsIgnoreCase("yellow") ||
-                    this.currentNode.getState().equalsIgnoreCase("red")) {
-                    this.currentNode.createMessage(new Message(this,
-                                                               this.currentNode,
-                                                               "clone"));
+                try {
+                    System.out.println(node.getName());
+                    Thread.sleep(500);
+                } catch(InterruptedException ie) {
+                    ie.printStackTrace();
                 }
-                Thread.sleep(1000);
-            } catch(InterruptedException ie) {
-                ie.printStackTrace();
+            }
+    
+            if ((this.currentNode.getState().equalsIgnoreCase("yellow") ||
+                this.currentNode.getState().equalsIgnoreCase("red")) &&
+                !this.currentNode.agentPresent()){
+                this.currentNode.createMessage(new Message(this,
+                                                           this.currentNode,
+                                                           null,
+                                                           "clone"));
             }
         }
     }
@@ -72,14 +85,24 @@ public class MobileAgent implements SensorObject, Runnable {
      * @return alertAgent
      */
     protected MobileAgent clone() {
+        Random rand = new Random();
+        long id = rand.nextLong();
+
+        if (id <= 0) {
+            id *= -1;
+        }
+
         return new MobileAgent(new LinkedBlockingQueue<>(),
-                               System.currentTimeMillis(),
+                               id,
                                this.currentNode,
                                false);
     }
 
+
+
     @Override
-    public synchronized void sendMessage() {
+    public synchronized void sendMessage(Message message) {
+
     }
     
     @Override

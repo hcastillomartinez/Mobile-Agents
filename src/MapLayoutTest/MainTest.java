@@ -13,12 +13,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 
 /**
- * MapTest.java is the main class used for running the program.
+ * MainTest.java is the main class used for running the program.
  * Danan High, 10/5/2018
  */
-public class MapTest {
+public class MainTest {
 
-    public MapTest() {}
+    public MainTest() {}
 
     public static void main(String[] args) {
         ArrayList<Thread> threads = new ArrayList<>();

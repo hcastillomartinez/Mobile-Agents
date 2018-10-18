@@ -14,7 +14,9 @@ public class Node implements SensorObject, Runnable {
     private String name;
     private BlockingQueue<Message> queue;
     private String state;
+    private int x, y;
     private List<Node> neighbors = new ArrayList<>();
+    private List<List<Node>> pathsBack;
     private List<MobileAgent> agentList;
     private MobileAgent agent;
     private boolean baseStation;
@@ -26,13 +28,18 @@ public class Node implements SensorObject, Runnable {
      * @param name, name of the node
      */
     public Node(BlockingQueue<Message> queue,
+                int x,
+                int y,
                 String state,
                 String name) {
         this.queue = queue;
+        this.x = x;
+        this.y = y;
         this.state = state;
         this.name = name;
         this.baseStation = false;
         this.agent = null;
+        this.pathsBack = new ArrayList<>();
     }
     
     /**
@@ -52,6 +59,12 @@ public class Node implements SensorObject, Runnable {
      * @return status, heat, of the node
      */
     public String getState() { return this.state; }
+    
+    /**
+     * Returning the x value for the node.
+     * @return x, for the node
+     */
+    public int getX() { return this.x; }
     
     /**
      * Setting the node to the base station when graph is being read in.
@@ -82,16 +95,16 @@ public class Node implements SensorObject, Runnable {
     }
     
     /**
-     * Returning the status of whether the node has an agent present.
-     * @return agentPresent, true if there is an agent and false otherwise
+     * Returning the mobile agent on the node.
+     * @return mobile agent on the node
      */
-    private boolean agentPresent() {
-        if (this.agent == null) {
-            return false;
-        } else {
-            return true;
-        }
-    }
+    public MobileAgent getAgent() { return this.agent; }
+    
+    /**
+     * Returning the list of the agents from the base station.
+     * @return list of agents from the base station
+     */
+    public List<MobileAgent> mobileAgents() { return this.agentList; }
     
     /**
      * Creating a message to add to this node
@@ -108,7 +121,7 @@ public class Node implements SensorObject, Runnable {
      * Sending a message to update/perform a task.
      */
     @Override
-    public synchronized void sendMessage() {
+    public synchronized void sendMessage(Message message) {
         try {
             Thread.sleep(0);
         } catch (InterruptedException ie) {
@@ -123,23 +136,70 @@ public class Node implements SensorObject, Runnable {
     public synchronized void getMessages() {
         try {
             Message message = this.queue.take();
-            analyzeMessage(message);
+            checkForCloneMessage(message);
+            checkForAddCloneMessage(message);
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
     }
+
+    /**
+     * Returning the status of whether the node has an agent present.
+     * @return agentPresent, true if there is an agent and false otherwise
+     */
+    public boolean agentPresent() {
+        if (this.agent == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
     
+    /**
+     * Analyzing the message from the queue for a message that has the nodes
+     * sending the new data about the clone to the base station.
+     */
+    private void checkForAddCloneMessage(Message m) {
+        
+        ///// testing the implementation of this method////////////
+        if (m.getSender().getClass().equals(Node.class)) {
+            MobileAgent mobileAgent = m.getClonedAgent();
+            
+            if (isBaseStation()) {
+                mobileAgents().add(mobileAgent);
+            } else {
+                for (Node n: getNeighbors()) {
+                    if (n.getX() < getX()) {
+                        System.out.println(getName());
+    
+                        createMessage(new Message(this,
+                                                  n,
+                                                  mobileAgent,
+                                                  "insert clone"));
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Analyzing the message from the queue.
      */
-    private void analyzeMessage(Message m) {
+    private void checkForCloneMessage(Message m) {
+        ///// testing the implementation of this method////////////
         if (m.getSender().getClass().equals(MobileAgent.class)) {
             if (m.getDetailedMessage().equalsIgnoreCase("clone")) {
                 MobileAgent mobileAgent = (MobileAgent) m.getSender();
-                
-                for (Node n: this.neighbors) {
+
+                for (Node n: this.getNeighbors()) {
                     if (!n.agentPresent()) {
                         n.setAgent(mobileAgent.clone());
+                        for (Node node: n.getNeighbors()) {
+                            node.createMessage(new Message(n,
+                                                           node,
+                                                           n.getAgent(),
+                                                           "insert clone"));
+                        }
                     }
                 }
             }
@@ -170,6 +230,9 @@ Types of messages to be sent:
     - for BaseNode from node
         - add new agent to the list of agentList
         - update location of the walking agent
+ */
+/*
+put list of base agent on the gui
  */
 
 

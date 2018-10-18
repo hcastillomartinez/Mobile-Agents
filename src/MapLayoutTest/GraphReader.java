@@ -64,7 +64,7 @@ public class GraphReader {
                     stationY = nodeY;
                     this.baseStationAssigned = true;
                 } else if (nextLine.equalsIgnoreCase("node")) {
-                    placeNodeInGraph(makeNodeName(nodeX, nodeY));
+                    placeNodeInGraph(makeNodeName(nodeX, nodeY), nodeX, nodeY);
                 } else if (nextLine.equalsIgnoreCase("fire") &&
                     !this.fireStarted) {
                     fireX = nodeX;
@@ -79,7 +79,7 @@ public class GraphReader {
             for (int i = 0; i < beginNode.size(); i++) {
                 placeEdgesInGraph(beginNode.get(i), endNode.get(i));
             }
-    
+            
             setStartingNodes(stationX, stationY, fireX, fireY);
     
             scanner.close();
@@ -87,7 +87,7 @@ public class GraphReader {
             fe.printStackTrace();
         }
     }
-    
+
     /**
      * Setting the fire and base station nodes.
      */
@@ -115,7 +115,7 @@ public class GraphReader {
      * Checking if the map contains the nodes, and if not adding it to the
      * graph.
      */
-    private void placeNodeInGraph(String name) {
+    private void placeNodeInGraph(String name, int newNodeX, int newNodeY) {
         boolean inKeys = false;
         for (Node n: this.graph.keySet()) {
             if (n.getName().equalsIgnoreCase(name)) {
@@ -125,6 +125,8 @@ public class GraphReader {
         
         if (!inKeys) {
             this.graph.put(new Node(new LinkedBlockingQueue<>(),
+                                    newNodeX,
+                                    newNodeY,
                                     "green",
                                     name),
                            new ArrayList<>());

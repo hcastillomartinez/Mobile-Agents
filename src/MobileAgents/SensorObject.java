@@ -10,7 +10,7 @@ public interface SensorObject {
      * Sending a message
      * @return message for the node
      */
-    void sendMessage();
+    void sendMessage(Message message);
     
     /**
      * Getting the next message in the queue.
