@@ -2,6 +2,7 @@ package MobileAgents;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
@@ -13,26 +14,28 @@ import java.util.concurrent.BlockingQueue;
 public class Node implements SensorObject, Runnable {
     
     private String name;
+    private Point coordinate;
     private BlockingQueue<Message> queue;
     private String state;
-    private List<Node> neighbors = new ArrayList<>();
-    private List<MobileAgent> agentList;
+    private List<Node> neighbors;
     private MobileAgent agent;
-    private boolean baseStation;
     
     /**
      * Constructor for the Node class.
      * @param queue, concurrent queue for storing events
+     * @param coordinate, location of the node
      * @param state, heat status of the node
      * @param name, name of the node
      */
     public Node(BlockingQueue<Message> queue,
+                Point coordinate,
                 String state,
                 String name) {
+        this.neighbors = new ArrayList<>();
         this.queue = queue;
+        this.coordinate = coordinate;
         this.state = state;
         this.name = name;
-        this.baseStation = false;
         this.agent = null;
     }
     
@@ -55,19 +58,10 @@ public class Node implements SensorObject, Runnable {
     public String getState() { return this.state; }
     
     /**
-     * Setting the node to the base station when graph is being read in.
+     * Returning the location of the node in the graph.
+     * @return point location of the node
      */
-    public void setBaseStation() {
-        this.baseStation = true;
-        this.agentList = new ArrayList<>();
-    }
-    
-    /**
-     * Setting the state of the node.
-     */
-    public void setState(String stateSet) {
-        this.state = stateSet;
-    }
+    public Point getCoordinate() { return this.coordinate; }
     
     /**
      * Returning the status of whether the node has an agent present
@@ -86,7 +80,15 @@ public class Node implements SensorObject, Runnable {
      */
     @Override
     synchronized public void sendMessage() {
-    
+//        try {
+//            // take a look here for how to store messages.
+//            // Maybe create a map that has all of the nodes and their associated
+//            // tasks that they are performing in a list?
+//            //      (key = SensorObj, value = list of messages).
+//            // will put the SensorObj in the BlockingQueue to take turns?
+//        } catch(InterruptedException ie) {
+//            ie.printStackTrace();
+//        }
     }
     
     /**
@@ -107,8 +109,7 @@ public class Node implements SensorObject, Runnable {
      */
     @Override
     public void run() {
-        sendMessage();
-        getMessages();
+    
     }
 }
 
@@ -122,10 +123,10 @@ Types of messages to be sent:
         
     - for node to node
         - tell BaseNode to add an agent
-        - tell neighbors to create agentList
+        - tell neighbors to create agents
         
     - for BaseNode from node
-        - add new agent to the list of agentList
+        - add new agent to the list of agents
         - update location of the walking agent
  */
 
