@@ -117,6 +117,7 @@ public class Node implements SensorObject, Runnable {
      */
     public void createMessage(Message message) {
         try {
+            System.out.println(message.toString());
             this.queue.put(message);
         } catch(InterruptedException ie) {
             ie.printStackTrace();
