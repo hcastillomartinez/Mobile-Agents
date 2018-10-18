@@ -61,12 +61,11 @@ public class MobileAgent implements SensorObject, Runnable {
             
             if (!node.agentPresent()) {
                 this.currentNode = neighbors.get(rand.nextInt(neighbors.size()));
-                try {
-                    System.out.println(node.getName());
-                    Thread.sleep(500);
-                } catch(InterruptedException ie) {
-                    ie.printStackTrace();
-                }
+//                try {
+//                    Thread.sleep(0);
+//                } catch(InterruptedException ie) {
+//                    ie.printStackTrace();
+//                }
             }
     
             if ((this.currentNode.getState().equalsIgnoreCase("yellow") ||

@@ -127,7 +127,7 @@ public class GraphReader {
             this.graph.put(new Node(new LinkedBlockingQueue<>(),
                                     newNodeX,
                                     newNodeY,
-                                    "green",
+                                    "blue",
                                     name),
                            new ArrayList<>());
         }
