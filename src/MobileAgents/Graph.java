@@ -9,7 +9,9 @@ public class Graph {
     private Map<Node,List<Node>> graph;
 
     /**
-     * Constructor for the Graph class
+     * Constructor for the Graph class that sets map in
+     * the graph to be a HashMap and
+     * @param root A Node Object
      */
     public Graph(Node root) {
         graph = new HashMap<>();
