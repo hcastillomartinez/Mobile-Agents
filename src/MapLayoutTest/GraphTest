@@ -8,6 +8,7 @@ node 3 0
 node 5 0
 edge 3 0 5 0
 edge 5 0 4 1
+edge 5 0 6 1
 edge 5 0 7 0
 edge 4 1 6 1
 node 4 1

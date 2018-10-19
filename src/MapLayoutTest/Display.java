@@ -91,9 +91,15 @@ public class Display extends Application {
         ObservableList<javafx.scene.Node> circle = this.pane.getChildren();
         Circle circle1;
         Circle circle2;
+        String nb="";
         for (Node node : this.nodes) {
             circle1 = findChild(circle, node.getName());
             List<Node> neighbors = node.getNeighbors();
+            for(Node no:neighbors){
+                nb+=" ("+no.getName()+")";
+            }
+            System.out.println("Circle: "+node.getName()+" Neighbors: "+nb);
+            nb="";
             for (Node n : neighbors) {
                 Line line = new Line();
                 circle2 = findChild(circle, n.getName());

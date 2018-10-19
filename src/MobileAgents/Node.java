@@ -66,11 +66,7 @@ public class Node implements SensorObject, Runnable {
      */
     public int getX() { return this.x; }
 
-    /**
-     * Returns the Y value for the node
-     * @return An int which is the y coordindate for the node.
-     */
-    public int getY(){return this.y;}
+
     
     /**
      * Returning the y value for the node.
