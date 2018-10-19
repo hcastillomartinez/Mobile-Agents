@@ -5,7 +5,6 @@ import java.util.*;
 
 import MobileAgents.Node;
 import javafx.application.Application;
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -31,15 +30,17 @@ public class Display extends Application {
     @Override
     public void start(Stage primaryStage){
         int circles=map.keySet().size();
-
-
         root.setPrefSize(circles*50,circles*50);
         pane.setPrefSize(circles*50,(circles*50)-200);
         pane.setLayoutX(25);
         pane.setLayoutY(100);
         root.getChildren().add(pane);
-        addNodes();
-        drawEdges();
+        List<Circle> circleList=new ArrayList<>();
+        List<Line> lineList=new ArrayList<>();
+        addNodes(circleList);
+        drawEdges(circleList,lineList);
+        pane.getChildren().addAll(lineList);
+        pane.getChildren().addAll(circleList);
         Scene scene=new Scene(root);
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
@@ -50,32 +51,32 @@ public class Display extends Application {
         launch(args);
     }
 
+
     /**
      * Draws the circles on Pane, does not draw them in any particular
      * order just what the keySet is for the map and that varies with how
      * the nodes are ordered in the text file.
      */
-    private void addNodes(){
+    private void addNodes(List<Circle> circleList){
         for(Iterator<Node> n=map.keySet().iterator();n.hasNext();){
             Node node=n.next();
                 Circle circle = new Circle(15, Color.valueOf(node.getState()));
                 circle.setId(node.getName());
                 circle.setCenterX(node.getX()*50);
                 circle.setCenterY(node.getY()*50);
-                this.pane.getChildren().add(circle);
+                circleList.add(circle);
         }
     }
 
     /**
-     * Finds Node that has the ID that we are searching for, name of the node,
-     * and when found typeCasts it before returning.
-     * @param list, ObservableList that is children of Pane.
-     * @param name, String that is ID of a circle(name of node).
-     * @return
+     * Finds the Circle that represents a node in the graph.
+     * @param circleList, List that contains Circle representations on nodes.
+     * @param name, ID of node we are looking for.
+     * @return Returns a Circle.
      */
-    private Circle findChild(ObservableList<javafx.scene.Node> list,String name){
-        for(javafx.scene.Node node: list){
-            if(node.getId().equals(name))return (Circle)node;
+    private Circle nodeToCircle(List<Circle> circleList, String name){
+        for(Circle circle:circleList){
+            if(circle.getId().equals(name))return circle;
         }
         return null;
     }
@@ -84,21 +85,20 @@ public class Display extends Application {
      * Goes from node to node drawing a line between nodes that is
      * its neighbors.
      */
-    private void drawEdges() {
-        ObservableList<javafx.scene.Node> circle = this.pane.getChildren();
+    private void drawEdges(List<Circle> circleList, List<Line> lineList) {
         Circle circle1;
         Circle circle2;
-        for (Node node : this.nodes) {
-            circle1 = findChild(circle, node.getName());
+        for (Node node : this.nodes) { //keySet
+            circle1 = nodeToCircle(circleList, node.getName());
             List<Node> neighbors = node.getNeighbors();
             for (Node n : neighbors) {
                 Line line = new Line();
-                circle2 = findChild(circle, n.getName());
+                circle2 = nodeToCircle(circleList, n.getName());
                 line.startXProperty().bind(circle1.centerXProperty());
                 line.startYProperty().bind(circle1.centerYProperty());
                 line.endXProperty().bind(circle2.centerXProperty());
                 line.endYProperty().bind(circle2.centerYProperty());
-                this.pane.getChildren().addAll(line);
+                lineList.add(line);
             }
         }
     }
