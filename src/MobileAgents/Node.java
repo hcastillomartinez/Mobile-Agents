@@ -237,6 +237,7 @@ public class Node implements SensorObject, Runnable {
                                   m.getSender(),
                                   null,
                                   "move ok");
+            this.setAgent(null);
             mobileAgent.sendMessage(message);
         }
 
@@ -287,18 +288,7 @@ Types of messages to be sent:
         - add new agent to the list of agentList
         - update location of the walking agent
  */
-/*
-put list of base agent on the gui
- */
 
-
-
-/*
-System.out.println(mobAgent.getId() + " = clone, " +
-                                               mobileAgent.getId() + " = " +
-                                               "orig" + " on this node = " +
-                                               getName());
- */
 
 
 

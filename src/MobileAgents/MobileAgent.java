@@ -109,6 +109,7 @@ public class MobileAgent implements SensorObject, Runnable {
         if (message.getDetailedMessage().equalsIgnoreCase("move ok")){
             Node node = (Node) message.getSender();
             setCurrentNode(node);
+            createMessageForNode("set agent");
             System.out.println(this.currentNode.getName() + " = currentNode"); // checking if random walk with producer consumer threading is working.
         }
         if (message.getDetailedMessage().equalsIgnoreCase("agent present")){
