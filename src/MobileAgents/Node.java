@@ -65,6 +65,12 @@ public class Node implements SensorObject, Runnable {
      * @return x, for the node
      */
     public int getX() { return this.x; }
+
+    /**
+     * Returns the Y value for the node
+     * @return An int which is the y coordindate for the node.
+     */
+    public int getY(){return this.y;}
     
     /**
      * Setting the node to the base station when graph is being read in.
