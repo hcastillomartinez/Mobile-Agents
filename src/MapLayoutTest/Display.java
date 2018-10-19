@@ -58,14 +58,11 @@ public class Display extends Application {
     private void addNodes(){
         for(Iterator<Node> n=map.keySet().iterator();n.hasNext();){
             Node node=n.next();
-            if(!drawn.contains(node)) {
                 Circle circle = new Circle(15, Color.valueOf(node.getState()));
                 circle.setId(node.getName());
                 circle.setCenterX(node.getX()*50);
                 circle.setCenterY(node.getY()*50);
-                System.out.println("circle: "+node.getName());
                 this.pane.getChildren().add(circle);
-            }
         }
     }
 
@@ -91,23 +88,17 @@ public class Display extends Application {
         ObservableList<javafx.scene.Node> circle = this.pane.getChildren();
         Circle circle1;
         Circle circle2;
-        String nb="";
         for (Node node : this.nodes) {
             circle1 = findChild(circle, node.getName());
             List<Node> neighbors = node.getNeighbors();
-            for(Node no:neighbors){
-                nb+=" ("+no.getName()+")";
-            }
-            System.out.println("Circle: "+node.getName()+" Neighbors: "+nb);
-            nb="";
             for (Node n : neighbors) {
                 Line line = new Line();
                 circle2 = findChild(circle, n.getName());
-                line.startXProperty().bind(circle1.centerXProperty().add(circle1.translateXProperty()));
-                line.startYProperty().bind(circle1.centerYProperty().add(circle1.translateYProperty()));
-                line.endXProperty().bind(circle2.centerXProperty().add(circle2.translateXProperty()));
-                line.endYProperty().bind(circle2.centerYProperty().add(circle2.translateYProperty()));
-                this.pane.getChildren().add(line);
+                line.startXProperty().bind(circle1.centerXProperty());
+                line.startYProperty().bind(circle1.centerYProperty());
+                line.endXProperty().bind(circle2.centerXProperty());
+                line.endYProperty().bind(circle2.centerYProperty());
+                this.pane.getChildren().addAll(line);
             }
         }
     }
