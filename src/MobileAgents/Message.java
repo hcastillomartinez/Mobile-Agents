@@ -56,4 +56,35 @@ public class Message {
      * @return clonedAgent to place at the baseStation
      */
     public MobileAgent getClonedAgent() { return clonedAgent; }
+    
+    /**
+     * Overriding toString to return the string of the message sender, receiver,
+     * and message that has been sent.
+     * @return string representation of the class
+     */
+    @Override
+    public String toString() {
+        Node senderHolder = null, receiverHolder = null;
+        MobileAgent senderMAHolder = null, receiverMAHolder = null;
+        
+        if (this.sender.getClass().equals(Node.class)) {
+            senderHolder = (Node) sender;
+            if (this.receiver.getClass().equals(Node.class)) {
+                return "Sender = " + senderHolder.getName() + " Receiver = " +
+                    ((Node) receiver).getName() + ": " + detailedMessage;
+            } else {
+                return "Sender = " + senderHolder.getName() + " Receiver = " +
+                    ((MobileAgent) receiver).getId() + ": " + detailedMessage;
+            }
+        } else {
+            senderMAHolder = (MobileAgent) sender;
+            if (this.receiver.getClass().equals(Node.class)) {
+                return "Sender = " + senderMAHolder.getId() + " Receiver = " +
+                    ((Node) receiver).getName() + ": " + detailedMessage;
+            } else {
+                return "Sender = " + senderMAHolder.getId() + " Receiver = " +
+                    ((MobileAgent) receiver).getId() + ": " + detailedMessage;
+            }
+        }
+    }
 }

@@ -1,10 +1,10 @@
-//import java.awt.*;
-//import java.util.concurrent.BlockingQueue;
-//import java.util.concurrent.SynchronousQueue;
-//
-//public class main {
-//    public static void main(String[] args){
-//        BlockingQueue<String> messages=new SynchronousQueue<>();
+import java.awt.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
+
+public class main {
+    public static void main(String[] args){
+        BlockingQueue<String> messages=new SynchronousQueue<>();
 //        Node baseStation=new Node(messages,new Point(0,0),"blue","A");
 //        Graph graph=new Graph();
 //        Node b=new Node(messages,new Point(0,1),"blue","B");
@@ -16,5 +16,5 @@
 ////        graph.addNeighbor(b,c);
 ////        graph.addNeighbor(c,d);
 //        graph.printGraph();
-//    }
-//}
+    }
+}

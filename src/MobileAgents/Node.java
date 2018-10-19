@@ -73,6 +73,12 @@ public class Node implements SensorObject, Runnable {
     public int getY(){return this.y;}
     
     /**
+     * Returning the y value for the node.
+     * @return y, for the node
+     */
+    public int getY() { return this.y; }
+    
+    /**
      * Setting the node to the base station when graph is being read in.
      */
     public void setBaseStation() {
@@ -117,6 +123,7 @@ public class Node implements SensorObject, Runnable {
      */
     public void createMessage(Message message) {
         try {
+            System.out.println("Producer: " + getName() + " = " + queue);
             this.queue.put(message);
         } catch(InterruptedException ie) {
             ie.printStackTrace();
@@ -141,9 +148,8 @@ public class Node implements SensorObject, Runnable {
     @Override
     public synchronized void getMessages() {
         try {
-            Message message = this.queue.take();
-            checkForCloneMessage(message);
-            checkForAddCloneMessage(message);
+            System.out.println("Consumer: " + getName() + " = " + queue);
+            analyzeMessage(queue.take());
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
@@ -162,28 +168,35 @@ public class Node implements SensorObject, Runnable {
     }
     
     /**
+     * Analyzing where to send the message.
+     */
+    private synchronized void analyzeMessage(Message m) {
+        if (m.getDetailedMessage().equalsIgnoreCase("clone")) {
+            checkForCloneMessage(m);
+        }
+        if (m.getDetailedMessage().equalsIgnoreCase("insert clone")) {
+            checkForAddCloneMessage(m);
+        }
+    }
+    
+    /**
      * Analyzing the message from the queue for a message that has the nodes
      * sending the new data about the clone to the base station.
      */
     private void checkForAddCloneMessage(Message m) {
-        
-        ///// testing the implementation of this method////////////
         if (m.getSender().getClass().equals(Node.class)) {
             MobileAgent mobileAgent = m.getClonedAgent();
             
             if (isBaseStation()) {
-                mobileAgents().add(mobileAgent);
-            } else {
-                for (Node n: getNeighbors()) {
-                    if (n.getX() < getX()) {
-                        System.out.println(getName());
-    
-                        createMessage(new Message(this,
-                                                  n,
-                                                  mobileAgent,
-                                                  "insert clone"));
-                    }
+                if (!mobileAgents().contains(mobileAgent)) {
+                    mobileAgents().add(mobileAgent);
                 }
+            } else {
+                Node node = getLowestRankedNode(this.getNeighbors());
+                node.createMessage(new Message(this,
+                                               node,
+                                               mobileAgent,
+                                               "insert clone"));
             }
         }
     }
@@ -192,24 +205,43 @@ public class Node implements SensorObject, Runnable {
      * Analyzing the message from the queue.
      */
     private void checkForCloneMessage(Message m) {
-        ///// testing the implementation of this method////////////
         if (m.getSender().getClass().equals(MobileAgent.class)) {
             if (m.getDetailedMessage().equalsIgnoreCase("clone")) {
                 MobileAgent mobileAgent = (MobileAgent) m.getSender();
-
+                
+                System.out.println("-------------");
                 for (Node n: this.getNeighbors()) {
                     if (!n.agentPresent()) {
                         n.setAgent(mobileAgent.clone());
-                        for (Node node: n.getNeighbors()) {
-                            node.createMessage(new Message(n,
-                                                           node,
-                                                           n.getAgent(),
-                                                           "insert clone"));
-                        }
+                        Node lowerNode = getLowestRankedNode(n.getNeighbors());
+                        Message message = new Message(n,
+                                                      lowerNode,
+                                                      n.getAgent(),
+                                                      "insert clone");
+                        System.out.println(message.toString());
+                        lowerNode.createMessage(message);
                     }
                 }
             }
         }
+    }
+    
+    /**
+     * Getting the lowest ranked neighbor.
+     * @return lowest ranked neighbor
+     */
+    private synchronized Node getLowestRankedNode(List<Node> list) {
+        Node lowerRankNode = null;
+        for (Node nodeCheck: list) {
+            if (lowerRankNode == null) {
+                lowerRankNode = nodeCheck;
+            } else {
+                if (lowerRankNode.getX() > nodeCheck.getX()) {
+                    lowerRankNode = nodeCheck;
+                }
+            }
+        }
+        return lowerRankNode;
     }
 
     /**

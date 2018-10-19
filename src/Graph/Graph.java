@@ -1,7 +1,10 @@
+import MobileAgents.Node;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 
 public class Graph {
     private Map<Node,List<Node>> graph;
@@ -27,7 +30,8 @@ public class Graph {
         for(Node n:keys){
             try{
                 List<Node> neighbor=n.getNeighbors();
-                System.out.println("root: "+n.getNodeName()+" children: "+neighborString(neighbor));
+                System.out.println("root: "+n.getName()+" children: " +
+                                       ""+neighborString(neighbor));
             }catch(NullPointerException np){
                 np.printStackTrace();
             }
@@ -37,7 +41,7 @@ public class Graph {
     public String neighborString(List<Node> temp){
         String names="";
         for(Node n: temp){
-            names+=" "+n.getNodeName();
+            names+=" "+n.getName();
         }
         return names;
     }
