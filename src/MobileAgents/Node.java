@@ -2,6 +2,7 @@ package MobileAgents;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -65,8 +66,6 @@ public class Node implements SensorObject, Runnable {
      * @return x, for the node
      */
     public int getX() { return this.x; }
-
-
     
     /**
      * Returning the y value for the node.
@@ -119,7 +118,13 @@ public class Node implements SensorObject, Runnable {
      */
     public void createMessage(Message message) {
         try {
-            System.out.println("Producer: " + getName() + " = " + queue);
+            Thread.sleep(1000);
+            MobileAgent m;
+            if (message.getSender().getClass().equals(MobileAgent.class)){
+                m = (MobileAgent) message.getSender();
+//                System.out.println("Producer: " + m.getId() + " = " +
+//                                           this.getName() + " " + this.queue);
+            }
             this.queue.put(message);
         } catch(InterruptedException ie) {
             ie.printStackTrace();
@@ -130,7 +135,7 @@ public class Node implements SensorObject, Runnable {
      * Sending a message to update/perform a task.
      */
     @Override
-    public synchronized void sendMessage(Message message) {
+    public void sendMessage(Message message) {
         try {
             Thread.sleep(0);
         } catch (InterruptedException ie) {
@@ -142,10 +147,19 @@ public class Node implements SensorObject, Runnable {
      * Getting a message from the queue to perform a task.
      */
     @Override
-    public synchronized void getMessages() {
+    public void getMessages() {
         try {
-            System.out.println("Consumer: " + getName() + " = " + queue);
-            analyzeMessage(queue.take());
+            while (true) {
+                Thread.sleep(1000);
+                Message message = this.queue.take();
+                MobileAgent m;
+                if (message.getSender().getClass().equals(MobileAgent.class)){
+                    m = (MobileAgent) message.getSender();
+//                    System.out.println("Consumer: " + m.getId() + " = " +
+//                                               this.getName() + this.queue);
+                }
+                analyzeMessage(this.queue.take());
+            }
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
@@ -167,11 +181,16 @@ public class Node implements SensorObject, Runnable {
      * Analyzing where to send the message.
      */
     private synchronized void analyzeMessage(Message m) {
-        if (m.getDetailedMessage().equalsIgnoreCase("clone")) {
-            checkForCloneMessage(m);
+        if (m.getDetailedMessage().equalsIgnoreCase("agent status")){
+            checkNodeForRandomWalk(m);
         }
-        if (m.getDetailedMessage().equalsIgnoreCase("insert clone")) {
+        if (m.getDetailedMessage().equalsIgnoreCase("insert clone")){
             checkForAddCloneMessage(m);
+        }
+        if (m.getDetailedMessage().equalsIgnoreCase("set agent")){
+            setAgent((MobileAgent) m.getSender());
+            System.out.println(this.getName() + " agent = " +
+                                       this.getAgent().getId());
         }
     }
     
@@ -200,26 +219,29 @@ public class Node implements SensorObject, Runnable {
     /**
      * Analyzing the message from the queue.
      */
-    private void checkForCloneMessage(Message m) {
-        if (m.getSender().getClass().equals(MobileAgent.class)) {
-            if (m.getDetailedMessage().equalsIgnoreCase("clone")) {
-                MobileAgent mobileAgent = (MobileAgent) m.getSender();
-                
-                System.out.println("-------------");
-                for (Node n: this.getNeighbors()) {
-                    if (!n.agentPresent()) {
-                        n.setAgent(mobileAgent.clone());
-                        Node lowerNode = getLowestRankedNode(n.getNeighbors());
-                        Message message = new Message(n,
-                                                      lowerNode,
-                                                      n.getAgent(),
-                                                      "insert clone");
-                        System.out.println(message.toString());
-                        lowerNode.createMessage(message);
-                    }
-                }
-            }
+    private void checkNodeForRandomWalk(Message m) {
+        Message message;
+        Random random = new Random();
+        MobileAgent mobileAgent = (MobileAgent) m.getSender();
+        int nodePosition = random.nextInt(this.getNeighbors().size());
+        Node node = this.getNeighbors().get(nodePosition);
+
+        if (node.agentPresent()) {
+            message = new Message(node,
+                                  m.getSender(),
+                                  null,
+                                  "agent present");
+            mobileAgent.sendMessage(message);
+        } else {
+            message = new Message(node,
+                                  m.getSender(),
+                                  null,
+                                  "move ok");
+            this.setAgent(null);
+            mobileAgent.sendMessage(message);
         }
+
+
     }
     
     /**
@@ -228,6 +250,7 @@ public class Node implements SensorObject, Runnable {
      */
     private synchronized Node getLowestRankedNode(List<Node> list) {
         Node lowerRankNode = null;
+
         for (Node nodeCheck: list) {
             if (lowerRankNode == null) {
                 lowerRankNode = nodeCheck;
@@ -265,12 +288,6 @@ Types of messages to be sent:
         - add new agent to the list of agentList
         - update location of the walking agent
  */
-/*
-put list of base agent on the gui
- */
-
-
-
 
 
 

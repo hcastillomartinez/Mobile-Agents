@@ -70,19 +70,19 @@ public class Message {
         if (this.sender.getClass().equals(Node.class)) {
             senderHolder = (Node) sender;
             if (this.receiver.getClass().equals(Node.class)) {
-                return "Sender = " + senderHolder.getName() + " Receiver = " +
+                return "Sender = " + senderHolder.getName() + ", Receiver = " +
                     ((Node) receiver).getName() + ": " + detailedMessage;
             } else {
-                return "Sender = " + senderHolder.getName() + " Receiver = " +
+                return "Sender = " + senderHolder.getName() + ", Receiver = " +
                     ((MobileAgent) receiver).getId() + ": " + detailedMessage;
             }
         } else {
             senderMAHolder = (MobileAgent) sender;
             if (this.receiver.getClass().equals(Node.class)) {
-                return "Sender = " + senderMAHolder.getId() + " Receiver = " +
+                return "Sender = " + senderMAHolder.getId() + ", Receiver = " +
                     ((Node) receiver).getName() + ": " + detailedMessage;
             } else {
-                return "Sender = " + senderMAHolder.getId() + " Receiver = " +
+                return "Sender = " + senderMAHolder.getId() + ", Receiver = " +
                     ((MobileAgent) receiver).getId() + ": " + detailedMessage;
             }
         }

@@ -1,11 +1,9 @@
 package MobileAgents;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * MobileAgent.java is the class that contains the functionality of an agent.
@@ -19,7 +17,6 @@ public class MobileAgent implements SensorObject, Runnable {
     private long id;
     private Node currentNode;
     private boolean walker;
-    private String nodeStatus;
     
     /**
      * Constructor for the MobileAgent class that has a unique id.
@@ -35,20 +32,25 @@ public class MobileAgent implements SensorObject, Runnable {
         this.currentNode = currentNode;
         this.walker = walker;
     }
-    
-    /**
-     * Getting the status of the node to determine if it is on fire.
-     */
-    private void getNodeStatus() {
-        this.nodeStatus = this.currentNode.getState();
-    }
 
     /**
      * Returning the id of the agent.
      * @return id, unique id of the agent
      */
     public long getId() { return this.id; }
-    
+
+    /**
+     * Function to create the specified message.
+     * @param messageCode phrase to send
+     */
+    private void createMessageForNode(String messageCode){
+        Message message = new Message(this,
+                                      this.currentNode,
+                                      null,
+                                      messageCode);
+        this.currentNode.createMessage(message);
+    }
+
     /**
      * Walking the nodes in the graph.
      */
@@ -58,24 +60,8 @@ public class MobileAgent implements SensorObject, Runnable {
         while (true) {
             neighbors = this.currentNode.getNeighbors();
             Node node = neighbors.get(rand.nextInt(neighbors.size()));
-            
-            if (!node.agentPresent()) {
-                this.currentNode = neighbors.get(rand.nextInt(neighbors.size()));
-//                try {
-//                    Thread.sleep(0);
-//                } catch(InterruptedException ie) {
-//                    ie.printStackTrace();
-//                }
-            }
-    
-            if ((this.currentNode.getState().equalsIgnoreCase("yellow") ||
-                this.currentNode.getState().equalsIgnoreCase("red")) &&
-                !this.currentNode.agentPresent()){
-                this.currentNode.createMessage(new Message(this,
-                                                           this.currentNode,
-                                                           null,
-                                                           "clone"));
-            }
+
+            createMessageForNode("agent status");
         }
     }
 
@@ -83,7 +69,7 @@ public class MobileAgent implements SensorObject, Runnable {
      * Creating a new agent if the node below is heated.
      * @return alertAgent
      */
-    protected MobileAgent clone() {
+    protected MobileAgent clone(Node n) {
         Random rand = new Random();
         long id = rand.nextLong();
 
@@ -93,20 +79,71 @@ public class MobileAgent implements SensorObject, Runnable {
 
         return new MobileAgent(new LinkedBlockingQueue<>(),
                                id,
-                               this.currentNode,
+                               n,
                                false);
     }
-
-
-
-    @Override
-    public synchronized void sendMessage(Message message) {
-
+    
+    /**
+     * Cloning the mobile agent on the nodes
+     */
+    private void cloneMobileAgent(Node node) {
+        for (Node n: node.getNeighbors()) {
+            n.setAgent(clone(node));
+        }
     }
-    
+
+    /**
+     * Setting the new currentNode to the neighbor without an agent
+     */
+    private void setCurrentNode(Node node) {
+        this.currentNode = node;
+    }
+
+    /**
+     * Analyzing the message from the sender
+     */
+    private void analyzeMessage(Message message) {
+        if (message.getDetailedMessage().equalsIgnoreCase("good to clone")){
+            cloneMobileAgent((Node) message.getSender());
+        }
+        if (message.getDetailedMessage().equalsIgnoreCase("move ok")){
+            Node node = (Node) message.getSender();
+            setCurrentNode(node);
+            createMessageForNode("set agent");
+            System.out.println(this.currentNode.getName() + " = currentNode"); // checking if random walk with producer consumer threading is working.
+        }
+        if (message.getDetailedMessage().equalsIgnoreCase("agent present")){
+            System.out.println("here agent present"); // checking if the detection system for if there is an agent present is working.
+            createMessageForNode("agent status");
+        }
+    }
+
+    /**
+     * Sending messages to the queue for the mobile agent.
+     * @param message
+     */
     @Override
-    public synchronized void getMessages() {
-    
+    public void sendMessage(Message message) {
+        try {
+            this.queue.put(message);
+            getMessages();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        }
+    }
+
+    /**
+     * Getting the messages from this list to perform tasks.
+     */
+    @Override
+    public void getMessages() {
+        try {
+            System.out.println(this.queue); // checking the queue of messages from the threads.
+            Message message = this.queue.take();
+            analyzeMessage(message);
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        }
     }
 
     @Override
@@ -116,3 +153,15 @@ public class MobileAgent implements SensorObject, Runnable {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
