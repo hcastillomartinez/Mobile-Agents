@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
@@ -41,6 +42,15 @@ public class Display extends Application {
         drawEdges(circleList,lineList);
         pane.getChildren().addAll(lineList);
         pane.getChildren().addAll(circleList);
+//        Timer t=new Timer();
+//        t.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                update(circleList);
+//                System.out.println("update");
+//            }
+//        },2000,2000);
+        update(circleList);
         Scene scene=new Scene(root);
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
@@ -51,7 +61,20 @@ public class Display extends Application {
         launch(args);
     }
 
+    public void update(List<Circle> circleList){
+        for(Circle circle: circleList){
+            Node n=circleToNode(this.nodes,circle.getId());
+            if(n.getAgent()==null) circle.setFill(Paint.valueOf(n.getState()));
+            else circle.setFill(Color.GREEN);
+        }
+    }
 
+    private Node circleToNode(Set<Node> keySet,String name){
+        for(Node node:keySet){
+            if(node.getName().equals(name))return node;
+        }
+        return null;
+    }
     /**
      * Draws the circles on Pane, does not draw them in any particular
      * order just what the keySet is for the map and that varies with how
@@ -61,6 +84,7 @@ public class Display extends Application {
         for(Iterator<Node> n=map.keySet().iterator();n.hasNext();){
             Node node=n.next();
                 Circle circle = new Circle(15, Color.valueOf(node.getState()));
+                circle.setStroke(Color.BLACK);
                 circle.setId(node.getName());
                 circle.setCenterX(node.getX()*50);
                 circle.setCenterY(node.getY()*50);
