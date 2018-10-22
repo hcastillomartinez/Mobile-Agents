@@ -166,17 +166,20 @@ public class Node implements SensorObject, Runnable {
      * Analyzing where to send the message.
      */
     private void analyzeMessage(Message m) {
-        if (m.getDetailedMessage().equalsIgnoreCase("agent status")){
+        System.out.println(m.toString());
+        String messageString = m.getDetailedMessage();
+
+        if (messageString.equalsIgnoreCase("agent status")){
             checkNodeForRandomWalk(m);
-        } else if (m.getDetailedMessage().equalsIgnoreCase("insert clone")){
+        } else if (messageString.equalsIgnoreCase("insert clone")){
             checkForAddCloneMessage(m);
-        } else if (m.getDetailedMessage().equalsIgnoreCase("set agent")){
+        } else if (messageString.equalsIgnoreCase("set agent")){
             setAgent((MobileAgent) m.getSender());
             System.out.println(this.getName() + " has agent = " +
                                        this.getAgent().getId());
-        } else if (m.getDetailedMessage().equalsIgnoreCase("null current")){
+        } else if (messageString.equalsIgnoreCase("null current")){
             this.agent = null;
-        } else if (m.getDetailedMessage().equalsIgnoreCase("check state")){
+        } else if (messageString.equalsIgnoreCase("check state")){
             Message message;
             if (m.getSender().getClass().equals(MobileAgent.class)){
                 MobileAgent mobileAgent = (MobileAgent) m.getSender();
