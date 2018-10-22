@@ -74,14 +74,6 @@ public class Node implements SensorObject, Runnable {
     public int getY() { return this.y; }
     
     /**
-     * Setting the node to the base station when graph is being read in.
-     */
-    public void setBaseStation() {
-        this.baseStation = true;
-        this.agentList = new ArrayList<>();
-    }
-    
-    /**
      * Returning if the current node is the base station
      * @return baseStation status
      */
@@ -112,19 +104,32 @@ public class Node implements SensorObject, Runnable {
      * @return list of agents from the base station
      */
     public List<MobileAgent> mobileAgents() { return this.agentList; }
+
+    /**
+     * Setting the node to the base station when graph is being read in.
+     */
+    public void setBaseStation() {
+        this.baseStation = true;
+        this.agentList = new ArrayList<>();
+    }
+
+    /**
+     * Returning the status of whether the node has an agent present.
+     * @return agentPresent, true if there is an agent and false otherwise
+     */
+    public boolean agentPresent() {
+        if (this.agent == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
     
     /**
      * Creating a message to add to this node
      */
     public void createMessage(Message message) {
         try {
-            Thread.sleep(1000);
-            MobileAgent m;
-            if (message.getSender().getClass().equals(MobileAgent.class)){
-                m = (MobileAgent) message.getSender();
-//                System.out.println("Producer: " + m.getId() + " = " +
-//                                           this.getName() + " " + this.queue);
-            }
             this.queue.put(message);
         } catch(InterruptedException ie) {
             ie.printStackTrace();
@@ -149,48 +154,50 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void getMessages() {
         try {
-            while (true) {
-                Thread.sleep(1000);
-                Message message = this.queue.take();
-                MobileAgent m;
-                if (message.getSender().getClass().equals(MobileAgent.class)){
-                    m = (MobileAgent) message.getSender();
-//                    System.out.println("Consumer: " + m.getId() + " = " +
-//                                               this.getName() + this.queue);
-                }
+            while(true){
                 analyzeMessage(this.queue.take());
             }
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
     }
-
-    /**
-     * Returning the status of whether the node has an agent present.
-     * @return agentPresent, true if there is an agent and false otherwise
-     */
-    public boolean agentPresent() {
-        if (this.agent == null) {
-            return false;
-        } else {
-            return true;
-        }
-    }
     
     /**
      * Analyzing where to send the message.
      */
-    private synchronized void analyzeMessage(Message m) {
+    private void analyzeMessage(Message m) {
         if (m.getDetailedMessage().equalsIgnoreCase("agent status")){
             checkNodeForRandomWalk(m);
-        }
-        if (m.getDetailedMessage().equalsIgnoreCase("insert clone")){
+        } else if (m.getDetailedMessage().equalsIgnoreCase("insert clone")){
             checkForAddCloneMessage(m);
-        }
-        if (m.getDetailedMessage().equalsIgnoreCase("set agent")){
+        } else if (m.getDetailedMessage().equalsIgnoreCase("set agent")){
             setAgent((MobileAgent) m.getSender());
-            System.out.println(this.getName() + " agent = " +
+            System.out.println(this.getName() + " has agent = " +
                                        this.getAgent().getId());
+        } else if (m.getDetailedMessage().equalsIgnoreCase("null current")){
+            this.agent = null;
+        } else if (m.getDetailedMessage().equalsIgnoreCase("check state")){
+            Message message;
+            if (m.getSender().getClass().equals(MobileAgent.class)){
+                MobileAgent mobileAgent = (MobileAgent) m.getSender();
+                if (this.getState().equalsIgnoreCase("yellow") ||
+                    this.getState().equalsIgnoreCase("red")){
+                    message = new Message(this,
+                                          (MobileAgent) m.getSender(),
+                                          null,
+                                          "good to clone");
+                    mobileAgent.sendMessage(message);
+                }
+            } else {
+                Node node = (Node) m.getSender();
+                if (this.getState().equalsIgnoreCase("yellow")){
+                    message = new Message(this,
+                                          node,
+                                          null,
+                                          "set state yellow");
+                    node.createMessage(message);
+                }
+            }
         }
     }
     
@@ -198,7 +205,7 @@ public class Node implements SensorObject, Runnable {
      * Analyzing the message from the queue for a message that has the nodes
      * sending the new data about the clone to the base station.
      */
-    private void checkForAddCloneMessage(Message m) {
+    private synchronized void checkForAddCloneMessage(Message m) {
         if (m.getSender().getClass().equals(Node.class)) {
             MobileAgent mobileAgent = m.getClonedAgent();
             
@@ -219,7 +226,7 @@ public class Node implements SensorObject, Runnable {
     /**
      * Analyzing the message from the queue.
      */
-    private void checkNodeForRandomWalk(Message m) {
+    private synchronized void checkNodeForRandomWalk(Message m) {
         Message message;
         Random random = new Random();
         MobileAgent mobileAgent = (MobileAgent) m.getSender();
@@ -237,7 +244,6 @@ public class Node implements SensorObject, Runnable {
                                   m.getSender(),
                                   null,
                                   "move ok");
-            this.setAgent(null);
             mobileAgent.sendMessage(message);
         }
 
@@ -254,10 +260,8 @@ public class Node implements SensorObject, Runnable {
         for (Node nodeCheck: list) {
             if (lowerRankNode == null) {
                 lowerRankNode = nodeCheck;
-            } else {
-                if (lowerRankNode.getX() > nodeCheck.getX()) {
-                    lowerRankNode = nodeCheck;
-                }
+            } else if (lowerRankNode.getX() > nodeCheck.getX()){
+                lowerRankNode = nodeCheck;
             }
         }
         return lowerRankNode;
@@ -290,7 +294,16 @@ Types of messages to be sent:
  */
 
 
+/*
+//                    System.out.println("Producer: " + m.getId() + " = " +
+//                                           this.getName() + " " + this.queue);
 
+
+
+//                    System.out.println("Consumer: " + m.getId() + " = " +
+//                                               this.getName() + this.queue);
+
+ */
 
 
 

@@ -55,13 +55,9 @@ public class MobileAgent implements SensorObject, Runnable {
      * Walking the nodes in the graph.
      */
     private void walk() {
-        Random rand = new Random();
-        List<Node> neighbors;
         while (true) {
-            neighbors = this.currentNode.getNeighbors();
-            Node node = neighbors.get(rand.nextInt(neighbors.size()));
-
             createMessageForNode("agent status");
+            createMessageForNode("check state");
         }
     }
 
@@ -90,30 +86,32 @@ public class MobileAgent implements SensorObject, Runnable {
         for (Node n: node.getNeighbors()) {
             n.setAgent(clone(node));
         }
+
     }
 
     /**
      * Setting the new currentNode to the neighbor without an agent
      */
     private void setCurrentNode(Node node) {
+        this.currentNode.setAgent(null);
         this.currentNode = node;
+        this.currentNode.setAgent(this);
     }
 
     /**
      * Analyzing the message from the sender
      */
     private void analyzeMessage(Message message) {
-        if (message.getDetailedMessage().equalsIgnoreCase("good to clone")){
+        String messageDetail = message.getDetailedMessage();
+
+        if (messageDetail.equalsIgnoreCase("good to clone")){
             cloneMobileAgent((Node) message.getSender());
-        }
-        if (message.getDetailedMessage().equalsIgnoreCase("move ok")){
+        } else if (messageDetail.equalsIgnoreCase("move ok")){
             Node node = (Node) message.getSender();
-            setCurrentNode(node);
-            createMessageForNode("set agent");
+            this.currentNode = node;
             System.out.println(this.currentNode.getName() + " = currentNode"); // checking if random walk with producer consumer threading is working.
-        }
-        if (message.getDetailedMessage().equalsIgnoreCase("agent present")){
-            System.out.println("here agent present"); // checking if the detection system for if there is an agent present is working.
+        } else if (messageDetail.equalsIgnoreCase("agent present")){
+            System.out.println(this.currentNode.getName() + " here agent present"); // checking if the detection system for if there is an agent present is working.
             createMessageForNode("agent status");
         }
     }
@@ -138,14 +136,15 @@ public class MobileAgent implements SensorObject, Runnable {
     @Override
     public void getMessages() {
         try {
-            System.out.println(this.queue); // checking the queue of messages from the threads.
-            Message message = this.queue.take();
-            analyzeMessage(message);
+            analyzeMessage(this.queue.take());
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
     }
 
+    /**
+     * Overriding run to perform specific tasks
+     */
     @Override
     public void run() {
         if (this.walker) {
