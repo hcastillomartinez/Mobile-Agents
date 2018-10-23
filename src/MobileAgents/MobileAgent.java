@@ -1,6 +1,5 @@
 package MobileAgents;
 
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -38,6 +37,14 @@ public class MobileAgent implements SensorObject, Runnable {
      * @return id, unique id of the agent
      */
     public long getId() { return this.id; }
+    
+    /**
+     * Setting the current node after a move.
+     * @param node to change to
+     */
+    public synchronized void setCurrentNode(Node node) {
+        this.currentNode = node;
+    }
 
     /**
      * Walking the nodes in the graph.
@@ -57,10 +64,18 @@ public class MobileAgent implements SensorObject, Runnable {
      * @param messageCode phrase to send
      */
     private synchronized void createMessageForNode(String messageCode){
-        Message message = new Message(this,
-                                      this.currentNode,
-                                      null,
-                                      messageCode);
+        Message message;
+        if (messageCode.equalsIgnoreCase("is agent status")) {
+            message = new Message(this,
+                                  this.currentNode,
+                                  this,
+                                  messageCode);
+        } else {
+            message = new Message(this,
+                                  this.currentNode,
+                                  null,
+                                  messageCode);
+        }
         this.currentNode.sendMessage(message);
     }
 
@@ -74,8 +89,7 @@ public class MobileAgent implements SensorObject, Runnable {
         
         if (id < 0) { id *= -1; }
 
-        MobileAgent mobileAgent = new MobileAgent(new LinkedBlockingQueue<>
-                                                      (1),
+        MobileAgent mobileAgent = new MobileAgent(new LinkedBlockingQueue<>(1),
                                                   id,
                                                   n,
                                                   false);
@@ -97,33 +111,32 @@ public class MobileAgent implements SensorObject, Runnable {
         }
         
         for (Node n: node.getNeighbors()) {
-            if (!n.agentPresent()) {
+            if (!n.agentPresent() && !n.getState().equalsIgnoreCase("re")) {
                 n.setAgent(clone(n));
                 System.out.println(n.getName() + " added agent " +
                                        n.getAgent().getId());
             } else {
                 System.out.println(n.getName() + " this node has agent " +
-                                       n.getAgent());
+                                       n.getAgent().getId());
             }
         }
-        System.out.println(node.getName() + " added agent " +
+        System.out.println(node.getName() + " home has added agent " +
                                node.getAgent().getId());
     }
 
     /**
      * Analyzing the message from the sender
      */
-    private void analyzeMessage(Message message) {
+    private synchronized void analyzeMessage(Message message) {
         String messageDetail = message.getDetailedMessage();
         Node node = (Node) message.getSender();
 
-        if (messageDetail.equalsIgnoreCase("good to clone")){
+        if (messageDetail.equalsIgnoreCase("good to clone")) {
             cloneMobileAgent(node);
-        } else if (messageDetail.equalsIgnoreCase("move ok")){
-            this.currentNode = node;
-            System.out.println(this.currentNode.getName() + " = curnode");
-        } else if (messageDetail.equalsIgnoreCase("agent present")){
-            createMessageForNode("agent status");
+        } else if (messageDetail.equalsIgnoreCase("moved")) {
+            System.out.println(this.currentNode.getName() + " = curNode");
+        } else if (messageDetail.equalsIgnoreCase("agent present")) {
+            createMessageForNode("is agent status");
         }
     }
 
@@ -146,13 +159,12 @@ public class MobileAgent implements SensorObject, Runnable {
     @Override
     public void getMessages() {
         try {
-//            Thread.sleep(1000);
+            Thread.sleep(1000);
             analyzeMessage(this.queue.take());
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
     }
-    
 
     /**
      * Overriding run to perform specific tasks
@@ -164,6 +176,26 @@ public class MobileAgent implements SensorObject, Runnable {
         }
     }
 }
+
+/*
+KISS = Keep It Simple Stupid
+    really applies for concurrency!!!
+ */
+/*
+10/23/2018
+Do not know the state of the object before looking at the object (lock).
+Will look at it and then proceed, or wait if lock has already been acquired.
+ */
+
+
+
+
+
+
+
+
+
+
 
 
 

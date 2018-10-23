@@ -26,6 +26,8 @@ public class Node implements SensorObject, Runnable {
     /**
      * Constructor for the Node class.
      * @param queue, concurrent queue for storing events
+     * @param x, x value for the node
+     * @param y, y value for the node
      * @param state, heat status of the node
      * @param name, name of the node
      */
@@ -82,6 +84,7 @@ public class Node implements SensorObject, Runnable {
 
     /**
      * Setting the state of the node.
+     * @param stateSet, state of the node
      */
     public void setState(String stateSet) {
         this.state = stateSet;
@@ -89,6 +92,7 @@ public class Node implements SensorObject, Runnable {
 
     /**
      * Returning the agent on the node.
+     * @param mobileAgent, mobile agent from this node
      */
     public void setAgent(MobileAgent mobileAgent) {
         this.agent = mobileAgent;
@@ -121,13 +125,13 @@ public class Node implements SensorObject, Runnable {
     public boolean agentPresent() {
         if (this.agent == null) {
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
 
     /**
      * Sending a message to update/perform a task.
+     * @param message, message
      */
     @Override
     public void sendMessage(Message message) {
@@ -145,10 +149,6 @@ public class Node implements SensorObject, Runnable {
     public synchronized void getMessages() {
         try {
             while(true){
-                if (this.agent != null) {
-//                    System.out.println("This node " + getName() + " has agent "+
-//                        agent.getId());
-                }
                 analyzeMessage(this.queue.take());
             }
         } catch (InterruptedException ie) {
@@ -158,20 +158,21 @@ public class Node implements SensorObject, Runnable {
     
     /**
      * Analyzing where to send the message.
+     * @param message, message to analyze
      */
-    private synchronized void analyzeMessage(Message m) {
-        String messageString = m.getDetailedMessage();
+    private synchronized void analyzeMessage(Message message) {
+        String messageString = message.getDetailedMessage();
 
         if (messageString.equalsIgnoreCase("is agent present")) {
-            checkNodeForRandomWalk(m);
+            checkNodeForRandomWalk(message);
         } else if (messageString.equalsIgnoreCase("insert clone")) {
-            checkForAddCloneMessage(m);
+            checkForAddCloneMessage(message);
         } else if (messageString.equalsIgnoreCase("set agent")){
-            setAgent((MobileAgent) m.getSender());
+            setAgent((MobileAgent) message.getSender());
         } else if (messageString.equalsIgnoreCase("null current")) {
             this.agent = null;
         } else if (messageString.equalsIgnoreCase("check state")) {
-            checkState(m.getSender());
+            checkState(message.getSender());
         } else if (messageString.equalsIgnoreCase("send clone home")) {
         
         }
@@ -186,6 +187,7 @@ public class Node implements SensorObject, Runnable {
     
     /**
      * Creating a message based upon who the sender was and the node state
+     * @param sensObj, object to check the state
      */
     private synchronized void checkState(SensorObject sensObj) {
         Message message;
@@ -213,10 +215,11 @@ public class Node implements SensorObject, Runnable {
     /**
      * Analyzing the message from the queue for a message that has the nodes
      * sending the new data about the clone to the base station.
+     * @param message, message to check
      */
-    private synchronized void checkForAddCloneMessage(Message m) {
-        if (m.getSender().getClass().equals(Node.class)) {
-            MobileAgent mobileAgent = m.getClonedAgent();
+    private synchronized void checkForAddCloneMessage(Message message) {
+        if (message.getSender().getClass().equals(Node.class)) {
+            MobileAgent mobileAgent = message.getClonedAgent();
             
             if (isBaseStation()) {
                 if (!mobileAgents().contains(mobileAgent)) {
@@ -234,27 +237,32 @@ public class Node implements SensorObject, Runnable {
 
     /**
      * Analyzing the message from the queue.
+     * @param message, message to check
      */
-    private synchronized void checkNodeForRandomWalk(Message m) {
-        Message message;
+    private synchronized void checkNodeForRandomWalk(Message message) {
+        Message messageToSend;
         Random random = new Random();
-        MobileAgent mobileAgent = (MobileAgent) m.getSender();
+        MobileAgent mobileAgent = (MobileAgent) message.getSender();
         int size = getNeighbors().size();
         int nodePosition = random.nextInt(this.getNeighbors().size());
         Node node = this.getNeighbors().get(nodePosition);
 
         if (node.agentPresent()) {
-            message = new Message(node,
-                                  m.getSender(),
+            messageToSend = new Message(node,
+                                  message.getSender(),
                                   null,
                                   "agent present");
-            mobileAgent.sendMessage(message);
+            mobileAgent.sendMessage(messageToSend);
         } else {
-            message = new Message(node,
-                                  m.getSender(),
+            this.setAgent(null);
+            node.setAgent(mobileAgent);
+            mobileAgent.setCurrentNode(node);
+            
+            messageToSend = new Message(node,
+                                  message.getSender(),
                                   null,
-                                  "move ok");
-            mobileAgent.sendMessage(message);
+                                  "moved");
+            mobileAgent.sendMessage(messageToSend);
         }
 
 
@@ -262,6 +270,7 @@ public class Node implements SensorObject, Runnable {
     
     /**
      * Getting the lowest ranked neighbor.
+     * @param list, of the neighbor nodes
      * @return lowest ranked neighbor
      */
     private synchronized Node getLowestRankedNode(List<Node> list) {
@@ -301,18 +310,6 @@ Types of messages to be sent:
     - for BaseNode from node
         - add new agent to the list of agentList
         - update location of the walking agent
- */
-
-
-/*
-//                    System.out.println("Producer: " + m.getId() + " = " +
-//                                           this.getName() + " " + this.queue);
-
-
-
-//                    System.out.println("Consumer: " + m.getId() + " = " +
-//                                               this.getName() + this.queue);
-
  */
 
 
