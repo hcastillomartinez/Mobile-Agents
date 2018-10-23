@@ -1,10 +1,8 @@
 package MapLayoutTest;
 
-import java.io.File;
 import java.util.*;
 
 import MobileAgents.Node;
-import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -18,19 +16,17 @@ import javafx.stage.Stage;
  * draws the graph of a map.
  * Hector Castillo
  */
-public class Display extends Application {
-    private String fileName = System.getProperty("user.dir") +
-            "/src/MapLayoutTest/GraphTest";
-    private GraphReader graphReader=new GraphReader(new File(fileName));
-    private HashMap<Node, ArrayList<Node>> map=graphReader.getGraph();
+public class Display {
     private AnchorPane root=new AnchorPane();
     private Pane pane=new Pane();
-    private List<Node> drawn=new ArrayList<>();
-    private Set<Node> nodes=map.keySet();
+    private Set<Node> nodes;
 
-    @Override
-    public void start(Stage primaryStage){
-        int circles=map.keySet().size();
+    public Display(Set<Node> n){
+        this.nodes=n;
+    }
+
+    public void createGUI(Stage primaryStage){
+        int circles=nodes.size();
         root.setPrefSize(circles*50,circles*50);
         pane.setPrefSize(circles*50,(circles*50)-200);
         pane.setLayoutX(25);
@@ -42,24 +38,20 @@ public class Display extends Application {
         drawEdges(circleList,lineList);
         pane.getChildren().addAll(lineList);
         pane.getChildren().addAll(circleList);
-//        Timer t=new Timer();
-//        t.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                update(circleList);
-//                System.out.println("update");
-//            }
-//        },2000,2000);
-        update(circleList);
+        Timer t=new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                update(circleList);
+                System.out.println("update");
+            }
+        },1,1);
         Scene scene=new Scene(root);
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    public static void main(String[] args){
-        launch(args);
-    }
 
     public void update(List<Circle> circleList){
         for(Circle circle: circleList){
@@ -81,7 +73,7 @@ public class Display extends Application {
      * the nodes are ordered in the text file.
      */
     private void addNodes(List<Circle> circleList){
-        for(Iterator<Node> n=map.keySet().iterator();n.hasNext();){
+        for(Iterator<Node> n=nodes.iterator();n.hasNext();){
             Node node=n.next();
                 Circle circle = new Circle(15, Color.valueOf(node.getState()));
                 circle.setStroke(Color.BLACK);
