@@ -1,6 +1,7 @@
 package MobileAgents;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
@@ -124,17 +125,6 @@ public class Node implements SensorObject, Runnable {
             return true;
         }
     }
-    
-    /**
-     * Creating a message to add to this node
-     */
-    public void createMessage(Message message) {
-        try {
-            this.queue.put(message);
-        } catch(InterruptedException ie) {
-            ie.printStackTrace();
-        }
-    }
 
     /**
      * Sending a message to update/perform a task.
@@ -142,7 +132,7 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void sendMessage(Message message) {
         try {
-            Thread.sleep(0);
+            this.queue.put(message);
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
@@ -152,9 +142,13 @@ public class Node implements SensorObject, Runnable {
      * Getting a message from the queue to perform a task.
      */
     @Override
-    public void getMessages() {
+    public synchronized void getMessages() {
         try {
             while(true){
+                if (this.agent != null) {
+//                    System.out.println("This node " + getName() + " has agent "+
+//                        agent.getId());
+                }
                 analyzeMessage(this.queue.take());
             }
         } catch (InterruptedException ie) {
@@ -165,41 +159,53 @@ public class Node implements SensorObject, Runnable {
     /**
      * Analyzing where to send the message.
      */
-    private void analyzeMessage(Message m) {
-        System.out.println(m.toString());
+    private synchronized void analyzeMessage(Message m) {
         String messageString = m.getDetailedMessage();
 
-        if (messageString.equalsIgnoreCase("agent status")){
+        if (messageString.equalsIgnoreCase("is agent present")) {
             checkNodeForRandomWalk(m);
-        } else if (messageString.equalsIgnoreCase("insert clone")){
+        } else if (messageString.equalsIgnoreCase("insert clone")) {
             checkForAddCloneMessage(m);
         } else if (messageString.equalsIgnoreCase("set agent")){
             setAgent((MobileAgent) m.getSender());
-            System.out.println(this.getName() + " has agent = " +
-                                       this.getAgent().getId());
-        } else if (messageString.equalsIgnoreCase("null current")){
+        } else if (messageString.equalsIgnoreCase("null current")) {
             this.agent = null;
-        } else if (messageString.equalsIgnoreCase("check state")){
-            Message message;
-            if (m.getSender().getClass().equals(MobileAgent.class)){
-                MobileAgent mobileAgent = (MobileAgent) m.getSender();
-                if (this.getState().equalsIgnoreCase("yellow") ||
-                    this.getState().equalsIgnoreCase("red")){
-                    message = new Message(this,
-                                          (MobileAgent) m.getSender(),
-                                          null,
-                                          "good to clone");
-                    mobileAgent.sendMessage(message);
-                }
-            } else {
-                Node node = (Node) m.getSender();
-                if (this.getState().equalsIgnoreCase("yellow")){
-                    message = new Message(this,
-                                          node,
-                                          null,
-                                          "set state yellow");
-                    node.createMessage(message);
-                }
+        } else if (messageString.equalsIgnoreCase("check state")) {
+            checkState(m.getSender());
+        } else if (messageString.equalsIgnoreCase("send clone home")) {
+        
+        }
+    }
+    
+    /**
+     * Sending the cloned mobile agent information home to the base station.
+     */
+    private synchronized void sendCloneToBaseStation() {
+    
+    }
+    
+    /**
+     * Creating a message based upon who the sender was and the node state
+     */
+    private synchronized void checkState(SensorObject sensObj) {
+        Message message;
+        
+        if (sensObj.getClass().equals(MobileAgent.class)) {
+            if (getState().equalsIgnoreCase("yellow") ||
+                getState().equalsIgnoreCase("red")) {
+                message = new Message(this,
+                                (MobileAgent) sensObj,
+                                null,
+                                "good to clone");
+                sensObj.sendMessage(message);
+            }
+        } else {
+            if (getState().equalsIgnoreCase("red")) {
+                message = new Message(this,
+                                (Node) sensObj,
+                                null,
+                                "set state yellow");
+                sensObj.sendMessage(message);
             }
         }
     }
@@ -218,7 +224,7 @@ public class Node implements SensorObject, Runnable {
                 }
             } else {
                 Node node = getLowestRankedNode(this.getNeighbors());
-                node.createMessage(new Message(this,
+                node.sendMessage(new Message(this,
                                                node,
                                                mobileAgent,
                                                "insert clone"));
@@ -233,6 +239,7 @@ public class Node implements SensorObject, Runnable {
         Message message;
         Random random = new Random();
         MobileAgent mobileAgent = (MobileAgent) m.getSender();
+        int size = getNeighbors().size();
         int nodePosition = random.nextInt(this.getNeighbors().size());
         Node node = this.getNeighbors().get(nodePosition);
 
@@ -263,7 +270,7 @@ public class Node implements SensorObject, Runnable {
         for (Node nodeCheck: list) {
             if (lowerRankNode == null) {
                 lowerRankNode = nodeCheck;
-            } else if (lowerRankNode.getX() > nodeCheck.getX()){
+            } else if (lowerRankNode.getX() > nodeCheck.getX()) {
                 lowerRankNode = nodeCheck;
             }
         }

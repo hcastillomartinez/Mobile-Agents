@@ -38,7 +38,7 @@ public class MainTest {
         
         for (Node n: map.keySet()) {
             if (n.isBaseStation()) {
-                BlockingQueue<Message> queue = new LinkedBlockingQueue<>();
+                BlockingQueue<Message> queue = new LinkedBlockingQueue<>(1);
                 long id = System.currentTimeMillis();
                 MobileAgent mobileAgent = new MobileAgent(queue,
                                                           id,
