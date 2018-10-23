@@ -118,7 +118,7 @@ public class MobileAgent implements SensorObject, Runnable {
     @Override
     public void getMessages() {
         try {
-            Thread.sleep(250);
+            Thread.sleep(500);
             analyzeMessage(this.queue.take());
         } catch (InterruptedException ie) {
             ie.printStackTrace();
