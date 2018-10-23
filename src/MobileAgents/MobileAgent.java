@@ -152,6 +152,7 @@ public class MobileAgent implements SensorObject, Runnable {
             ie.printStackTrace();
         }
     }
+    
 
     /**
      * Overriding run to perform specific tasks
