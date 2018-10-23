@@ -151,6 +151,11 @@ public class Node implements SensorObject, Runnable {
         try {
             while(!this.state.equalsIgnoreCase("red")){
                 analyzeMessage(this.queue.take());
+                for (Node n: this.neighbors) {
+                    if (n.getState().equalsIgnoreCase("red")) {
+                        setState("yellow");
+                    }
+                }
             }
         } catch (InterruptedException ie) {
             ie.printStackTrace();
@@ -166,14 +171,8 @@ public class Node implements SensorObject, Runnable {
 
         if (messageString.equalsIgnoreCase("is agent present")) {
             checkNodeForRandomWalk(message);
-        } else if (messageString.equalsIgnoreCase("insert clone")) {
-            checkForAddCloneMessage(message);
-        } else if (messageString.equalsIgnoreCase("set agent")){
-            setAgent((MobileAgent) message.getSender());
         } else if (messageString.equalsIgnoreCase("clone")) {
             cloneAgents();
-        } else if (messageString.equalsIgnoreCase("check state")) {
-            checkState(message.getSender());
         } else if (messageString.equalsIgnoreCase("send clone home")) {
         
         }
@@ -213,63 +212,6 @@ public class Node implements SensorObject, Runnable {
     private synchronized void sendCloneToBaseStation() {
     
     }
-    
-    /**
-     * Creating a message based upon who the sender was and the node state
-     * @param sensObj, object to check the state
-     */
-    private synchronized void checkState(SensorObject sensObj) {
-        Message message;
-        
-        if (sensObj.getClass().equals(MobileAgent.class)) {
-            if (getState().equalsIgnoreCase("yellow")) {
-                ((MobileAgent) sensObj).setWalkerStatus();
-                message = new Message(this,
-                                      sensObj,
-                                     null,
-                                     "yellow");
-                sensObj.sendMessage(message);
-            } else if (getState().equalsIgnoreCase("red")) {
-                ((MobileAgent) sensObj).setWalkerStatus();
-                message = new Message(this,
-                                      sensObj,
-                                      null,
-                                      "red");
-                sensObj.sendMessage(message);
-            }
-        } else {
-            if (getState().equalsIgnoreCase("red")) {
-                message = new Message(this,
-                                      sensObj,
-                                      null,
-                                      "set state yellow");
-                sensObj.sendMessage(message);
-            }
-        }
-    }
-    
-    /**
-     * Analyzing the message from the queue for a message that has the nodes
-     * sending the new data about the clone to the base station.
-     * @param message, message to check
-     */
-    private synchronized void checkForAddCloneMessage(Message message) {
-        if (message.getSender().getClass().equals(Node.class)) {
-            MobileAgent mobileAgent = message.getClonedAgent();
-            
-            if (isBaseStation()) {
-                if (!mobileAgents().contains(mobileAgent)) {
-                    mobileAgents().add(mobileAgent);
-                }
-            } else {
-                Node node = getLowestRankedNode(this.getNeighbors());
-                node.sendMessage(new Message(this,
-                                               node,
-                                               mobileAgent,
-                                               "insert clone"));
-            }
-        }
-    }
 
     /**
      * Analyzing the message from the queue.
@@ -279,7 +221,6 @@ public class Node implements SensorObject, Runnable {
         Message messageToSend;
         Random random = new Random();
         MobileAgent mobileAgent = (MobileAgent) message.getSender();
-        int size = getNeighbors().size();
         int nodePosition = random.nextInt(this.getNeighbors().size());
         Node node = this.getNeighbors().get(nodePosition);
 
@@ -348,8 +289,63 @@ Types of messages to be sent:
         - update location of the walking agent
  */
 
-
-
+/* storage for functions that have been deleted but may need are below */
+//    /**
+//     * Creating a message based upon who the sender was and the node state
+//     * @param sensObj, object to check the state
+//     */
+//    private synchronized void checkState(SensorObject sensObj) {
+//        Message message;
+//
+//        if (sensObj.getClass().equals(MobileAgent.class)) {
+//            if (getState().equalsIgnoreCase("yellow")) {
+//                ((MobileAgent) sensObj).setWalkerStatus();
+//                message = new Message(this,
+//                                      sensObj,
+//                                     null,
+//                                     "yellow");
+//                sensObj.sendMessage(message);
+//            } else if (getState().equalsIgnoreCase("red")) {
+//                ((MobileAgent) sensObj).setWalkerStatus();
+//                message = new Message(this,
+//                                      sensObj,
+//                                      null,
+//                                      "red");
+//                sensObj.sendMessage(message);
+//            }
+//        } else {
+//            if (getState().equalsIgnoreCase("red")) {
+//                message = new Message(this,
+//                                      sensObj,
+//                                      null,
+//                                      "set state yellow");
+//                sensObj.sendMessage(message);
+//            }
+//        }
+//    }
+//
+//    /**
+//     * Analyzing the message from the queue for a message that has the nodes
+//     * sending the new data about the clone to the base station.
+//     * @param message, message to check
+//     */
+//    private synchronized void checkForAddCloneMessage(Message message) {
+//        if (message.getSender().getClass().equals(Node.class)) {
+//            MobileAgent mobileAgent = message.getClonedAgent();
+//
+//            if (isBaseStation()) {
+//                if (!mobileAgents().contains(mobileAgent)) {
+//                    mobileAgents().add(mobileAgent);
+//                }
+//            } else {
+//                Node node = getLowestRankedNode(this.getNeighbors());
+//                node.sendMessage(new Message(this,
+//                                               node,
+//                                               mobileAgent,
+//                                               "insert clone"));
+//            }
+//        }
+//    }
 
 
 

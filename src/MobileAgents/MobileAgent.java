@@ -54,10 +54,13 @@ public class MobileAgent implements SensorObject, Runnable {
      */
     private void checkNode() {
         while (!this.currentNode.getState().equalsIgnoreCase("red")) {
+            if (this.currentNode.getState().equalsIgnoreCase("yellow")) {
+                setWalkerStatus();
+                createMessageForNode("clone");
+            }
             if (this.walker) {
                 createMessageForNode("is agent present");
             }
-            createMessageForNode("check state");
             getMessages();
         }
     }
@@ -91,8 +94,6 @@ public class MobileAgent implements SensorObject, Runnable {
 
         if (messageDetail.equalsIgnoreCase("yellow")) {
             createMessageForNode("clone");
-        } else if (messageDetail.equalsIgnoreCase("moved")) {
-            System.out.println(this.currentNode.getName() + " = curNode");
         } else if (messageDetail.equalsIgnoreCase("agent present")) {
             createMessageForNode("is agent status");
         }
@@ -117,7 +118,7 @@ public class MobileAgent implements SensorObject, Runnable {
     @Override
     public void getMessages() {
         try {
-            Thread.sleep(500);
+            Thread.sleep(250);
             analyzeMessage(this.queue.take());
         } catch (InterruptedException ie) {
             ie.printStackTrace();
