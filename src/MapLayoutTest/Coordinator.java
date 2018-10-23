@@ -19,6 +19,7 @@ public class Coordinator extends Application {
     GraphReader gr = new GraphReader(new File(fileName));
     HashMap<Node, ArrayList<Node>> map = gr.getGraph();
     Display display=new Display(map.keySet());
+    
     public void beginSim(){
         for (Node n: map.keySet()) {
             if (n.isBaseStation()) {
@@ -44,6 +45,7 @@ public class Coordinator extends Application {
      display.createGUI(primaryStage);
      beginSim();
     }
+    
     public static void main(String[]args){
         launch(args);
     }

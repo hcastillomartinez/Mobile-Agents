@@ -1,12 +1,10 @@
 package MobileAgents;
 
-import java.util.Random;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * MobileAgent.java is the class that contains the functionality of an agent.
- * It can walk, clone itself and it implements the Runnable and SensorObject
+ * It can checkNode, clone itself and it implements the Runnable and SensorObject
  * interfaces.
  * Danan High, 10/11/2018
  */
@@ -45,12 +43,17 @@ public class MobileAgent implements SensorObject, Runnable {
     public synchronized void setCurrentNode(Node node) {
         this.currentNode = node;
     }
+    
+    /**
+     * Setting the walker to stop walking.
+     */
+    public synchronized void setWalkerStatus() { this.walker = false; }
 
     /**
      * Walking the nodes in the graph.
      */
-    private void walk() {
-        while (true) {
+    private void checkNode() {
+        while (!this.currentNode.getState().equalsIgnoreCase("red")) {
             if (this.walker) {
                 createMessageForNode("is agent present");
             }
@@ -80,59 +83,14 @@ public class MobileAgent implements SensorObject, Runnable {
     }
 
     /**
-     * Creating a new agent if the node below is heated.
-     * @return alertAgent
-     */
-    protected synchronized MobileAgent clone(Node n) {
-        Random rand = new Random();
-        long id = rand.nextLong();
-        
-        if (id < 0) { id *= -1; }
-
-        MobileAgent mobileAgent = new MobileAgent(new LinkedBlockingQueue<>(1),
-                                                  id,
-                                                  n,
-                                                  false);
-        n.sendMessage(new Message(this,
-                                  n,
-                                  mobileAgent,
-                                  "send clone home"));
-        return mobileAgent;
-    }
-    
-    /**
-     * Cloning the mobile agent on the nodes
-     */
-    private synchronized void cloneMobileAgent(Node node) {
-        this.walker = false;
-        
-        if (!node.agentPresent()) {
-            node.setAgent(this);
-        }
-        
-        for (Node n: node.getNeighbors()) {
-            if (!n.agentPresent() && !n.getState().equalsIgnoreCase("re")) {
-                n.setAgent(clone(n));
-                System.out.println(n.getName() + " added agent " +
-                                       n.getAgent().getId());
-            } else {
-                System.out.println(n.getName() + " this node has agent " +
-                                       n.getAgent().getId());
-            }
-        }
-        System.out.println(node.getName() + " home has added agent " +
-                               node.getAgent().getId());
-    }
-
-    /**
      * Analyzing the message from the sender
      */
     private synchronized void analyzeMessage(Message message) {
         String messageDetail = message.getDetailedMessage();
         Node node = (Node) message.getSender();
 
-        if (messageDetail.equalsIgnoreCase("good to clone")) {
-            cloneMobileAgent(node);
+        if (messageDetail.equalsIgnoreCase("yellow")) {
+            createMessageForNode("clone");
         } else if (messageDetail.equalsIgnoreCase("moved")) {
             System.out.println(this.currentNode.getName() + " = curNode");
         } else if (messageDetail.equalsIgnoreCase("agent present")) {
@@ -142,7 +100,7 @@ public class MobileAgent implements SensorObject, Runnable {
 
     /**
      * Sending messages to the queue for the mobile agent.
-     * @param message
+     * @param message to add to the queue
      */
     @Override
     public void sendMessage(Message message) {
@@ -159,7 +117,7 @@ public class MobileAgent implements SensorObject, Runnable {
     @Override
     public void getMessages() {
         try {
-            Thread.sleep(1000);
+            Thread.sleep(500);
             analyzeMessage(this.queue.take());
         } catch (InterruptedException ie) {
             ie.printStackTrace();
@@ -170,11 +128,7 @@ public class MobileAgent implements SensorObject, Runnable {
      * Overriding run to perform specific tasks
      */
     @Override
-    public void run() {
-        if (this.walker) {
-            walk();
-        }
-    }
+    public void run() { checkNode(); }
 }
 
 /*
