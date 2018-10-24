@@ -17,4 +17,9 @@ public interface SensorObject {
      * @return message
      */
     void getMessages();
+
+    /**
+     * Function used for analyzing the messages
+     */
+    void analyzeMessage(Message message);
 }

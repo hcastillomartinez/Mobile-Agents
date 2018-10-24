@@ -157,6 +157,8 @@ public class Node implements SensorObject, Runnable {
                     }
                 }
             }
+            removeClone(this.agent);
+            this.agent = null;
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
@@ -166,7 +168,8 @@ public class Node implements SensorObject, Runnable {
      * Analyzing where to send the message.
      * @param message, message to analyze
      */
-    private synchronized void analyzeMessage(Message message) {
+    @Override
+    public synchronized void analyzeMessage(Message message) {
         String messageString = message.getDetailedMessage();
 
         if (messageString.equalsIgnoreCase("is agent present")) {
@@ -174,7 +177,11 @@ public class Node implements SensorObject, Runnable {
         } else if (messageString.equalsIgnoreCase("clone")) {
             cloneAgents();
         } else if (messageString.equalsIgnoreCase("send clone home")) {
-        
+            // go to the base station and add to the agent list
+            sendCloneToBaseStation(message.getClonedAgent());
+        } else if (messageString.equalsIgnoreCase("remove clone")) {
+            // go to the base station and remove from the agent list
+            removeClone(message.getClonedAgent());
         }
     }
     
@@ -202,15 +209,50 @@ public class Node implements SensorObject, Runnable {
             if (!n.getState().equalsIgnoreCase("red") &&
                 !n.agentPresent()) {
                 n.setAgent(clone(n));
+                if (n.getState().equalsIgnoreCase("yellow")) {
+                    n.sendMessage(new Message(n,
+                                              n,
+                                              n.getAgent(),
+                                              "clone"));
+                }
+                sendCloneToBaseStation(n.getAgent());
             }
+        }
+    }
+    
+    /**
+     * Removing the agent from the base station agent list
+     */
+    private synchronized void removeClone(MobileAgent mobileAgent) {
+        if (this.isBaseStation()) {
+            this.agentList.remove(mobileAgent);
+        } else {
+            Node node = getLowestRankedNode(this.neighbors);
+            Message message = new Message(this,
+                                          node,
+                                          this.agent,
+                                          "remove clone");
+            node.sendMessage(message);
         }
     }
     
     /**
      * Sending the cloned mobile agent information home to the base station.
      */
-    private synchronized void sendCloneToBaseStation() {
-    
+    private synchronized void sendCloneToBaseStation(MobileAgent mobileAgent) {
+        if (this.isBaseStation()) {
+            if (!this.agentList.contains(mobileAgent)) {
+                this.agentList.add(mobileAgent);
+            }
+            System.out.println(agentList);
+        } else {
+            Node node = getLowestRankedNode(this.neighbors);
+            Message message = new Message(this,
+                                          node,
+                                          mobileAgent,
+                                          "send clone home");
+            node.sendMessage(message);
+        }
     }
 
     /**
@@ -226,7 +268,7 @@ public class Node implements SensorObject, Runnable {
 
         if (node.agentPresent()) {
             messageToSend = new Message(node,
-                                        message.getSender(),
+                                        mobileAgent,
                                         null,
                                         "agent present");
             mobileAgent.sendMessage(messageToSend);
@@ -234,9 +276,10 @@ public class Node implements SensorObject, Runnable {
             this.setAgent(null);
             node.setAgent(mobileAgent);
             mobileAgent.setCurrentNode(node);
+            sendCloneToBaseStation(mobileAgent);
             
             messageToSend = new Message(node,
-                                        message.getSender(),
+                                        mobileAgent,
                                         null,
                                         "moved");
             mobileAgent.sendMessage(messageToSend);
@@ -267,9 +310,7 @@ public class Node implements SensorObject, Runnable {
      * Performing a task on this specific thread.
      */
     @Override
-    public void run() {
-        getMessages();
-    }
+    public void run() { getMessages(); }
 }
 
 

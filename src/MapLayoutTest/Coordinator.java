@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -24,8 +25,13 @@ public class Coordinator extends Application {
         for (Node n: map.keySet()) {
             if (n.isBaseStation()) {
                 BlockingQueue<Message> queue = new LinkedBlockingQueue<>(1);
-                long id = System.currentTimeMillis();
-                MobileAgent mobileAgent = new MobileAgent(queue, id, n, true);
+                long id = (new Random()).nextLong();
+                MobileAgent mobileAgent = new MobileAgent(queue,
+                                                          Math.abs(id),
+                                                          n,
+                                                          true);
+                n.setAgent(mobileAgent);
+                mobileAgent.setCurrentNode(n);
                 threads.add(new Thread(mobileAgent));
                 if(false);
             }

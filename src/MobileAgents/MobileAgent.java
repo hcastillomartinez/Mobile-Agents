@@ -87,14 +87,13 @@ public class MobileAgent implements SensorObject, Runnable {
 
     /**
      * Analyzing the message from the sender
+     * @param message, message to analyze from the sender
      */
-    private synchronized void analyzeMessage(Message message) {
+    @Override
+    public synchronized void analyzeMessage(Message message) {
         String messageDetail = message.getDetailedMessage();
-        Node node = (Node) message.getSender();
 
-        if (messageDetail.equalsIgnoreCase("yellow")) {
-            createMessageForNode("clone");
-        } else if (messageDetail.equalsIgnoreCase("agent present")) {
+        if (messageDetail.equalsIgnoreCase("agent present")) {
             createMessageForNode("is agent status");
         }
     }
@@ -123,6 +122,14 @@ public class MobileAgent implements SensorObject, Runnable {
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
+    }
+    
+    /**
+     * Overriding toString() to print out the agent
+     * @return string for the agent
+     */
+    public synchronized String toString() {
+        return "" + this.getId() + "";
     }
 
     /**
