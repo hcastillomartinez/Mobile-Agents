@@ -27,15 +27,6 @@ public class MainTest {
         GraphReader gr = new GraphReader(new File(fileName));
         HashMap<Node, ArrayList<Node>> map = gr.getGraph();
         
-//        for (Map.Entry<Node, ArrayList<Node>> m: map.entrySet()) {
-//            System.out.print("key = " + m.getKey().getName());
-//            System.out.print("[");
-//            for (Node n: m.getValue()) {
-//                System.out.print(n.getName() + "    ");
-//            }
-//            System.out.println("]");
-//        }
-        
         for (Node n: map.keySet()) {
             if (n.isBaseStation()) {
                 BlockingQueue<Message> queue = new LinkedBlockingQueue<>(1);
@@ -43,6 +34,7 @@ public class MainTest {
                 MobileAgent mobileAgent = new MobileAgent(queue,
                                                           id,
                                                           n,
+                                                          true,
                                                           true);
                 threads.add(new Thread(mobileAgent));
             }

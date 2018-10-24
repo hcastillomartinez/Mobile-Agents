@@ -124,7 +124,7 @@ public class GraphReader {
         }
         
         if (!inKeys) {
-            this.graph.put(new Node(new LinkedBlockingQueue<>(1),
+            this.graph.put(new Node(new LinkedBlockingQueue<>(5),
                                     newNodeX,
                                     newNodeY,
                                     "blue",

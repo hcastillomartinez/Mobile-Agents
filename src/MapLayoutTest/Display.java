@@ -43,7 +43,7 @@ public class Display {
             @Override
             public void run() {
                 update(circleList);
-                System.out.println("update");
+//                System.out.println("update");
             }
         },1,1);
         Scene scene=new Scene(root);
