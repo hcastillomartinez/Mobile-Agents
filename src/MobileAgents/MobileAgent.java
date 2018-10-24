@@ -129,7 +129,7 @@ public class MobileAgent implements SensorObject, Runnable {
      * @return string for the agent
      */
     public synchronized String toString() {
-        return "" + this.getId() + "";
+        return "" + this.getId() + " " + this.currentNode.getName();
     }
 
     /**
@@ -138,16 +138,6 @@ public class MobileAgent implements SensorObject, Runnable {
     @Override
     public void run() { checkNode(); }
 }
-
-/*
-KISS = Keep It Simple Stupid
-    really applies for concurrency!!!
- */
-/*
-10/23/2018
-Do not know the state of the object before looking at the object (lock).
-Will look at it and then proceed, or wait if lock has already been acquired.
- */
 
 
 
