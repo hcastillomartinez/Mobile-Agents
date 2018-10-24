@@ -46,7 +46,7 @@ public class Node implements SensorObject, Runnable {
         this.agent = null;
         this.pathsBack = new ArrayList<>();
     }
-    
+
     /**
      * Returning the name of the node.
      * @return name of the node
@@ -148,6 +148,7 @@ public class Node implements SensorObject, Runnable {
      */
     @Override
     public synchronized void getMessages() {
+        long time = System.currentTimeMillis();
         try {
             while(!this.state.equalsIgnoreCase("red")){
                 analyzeMessage(this.queue.take());
@@ -157,8 +158,7 @@ public class Node implements SensorObject, Runnable {
                     }
                 }
             }
-            removeClone(this.agent);
-            this.agent = null;
+            removeClone(this.agent, this);
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
@@ -177,11 +177,12 @@ public class Node implements SensorObject, Runnable {
         } else if (messageString.equalsIgnoreCase("clone")) {
             cloneAgents();
         } else if (messageString.equalsIgnoreCase("send clone home")) {
-            // go to the base station and add to the agent list
-            sendCloneToBaseStation(message.getClonedAgent());
+            sendCloneToBaseStation(message.getClonedAgent(), this);
         } else if (messageString.equalsIgnoreCase("remove clone")) {
-            // go to the base station and remove from the agent list
-            removeClone(message.getClonedAgent());
+            removeClone(message.getClonedAgent(), this);
+        } else if (messageString.equalsIgnoreCase("update state")) {
+            System.out.println(message.toString());
+//            updateState();
         }
     }
     
@@ -192,13 +193,11 @@ public class Node implements SensorObject, Runnable {
      */
     private synchronized MobileAgent clone(Node node) {
         long id = (new Random()).nextLong();
-
-        if (id < 0) { id *= -1; }
-        
         return new MobileAgent(new LinkedBlockingQueue<>(1),
-                               id,
+                               Math.abs(id),
                                node,
-                               false);
+                               false,
+                               true);
     }
     
     /**
@@ -215,7 +214,7 @@ public class Node implements SensorObject, Runnable {
                                               n.getAgent(),
                                               "clone"));
                 }
-                sendCloneToBaseStation(n.getAgent());
+                sendCloneToBaseStation(n.getAgent(), this);
             }
         }
     }
@@ -223,9 +222,11 @@ public class Node implements SensorObject, Runnable {
     /**
      * Removing the agent from the base station agent list
      */
-    private synchronized void removeClone(MobileAgent mobileAgent) {
+    private synchronized void removeClone(MobileAgent mobileAgent,
+                                          SensorObject sender) {
         if (this.isBaseStation()) {
             this.agentList.remove(mobileAgent);
+
         } else {
             Node node = getLowestRankedNode(this.neighbors);
             Message message = new Message(this,
@@ -235,16 +236,21 @@ public class Node implements SensorObject, Runnable {
             node.sendMessage(message);
         }
     }
-    
+
     /**
      * Sending the cloned mobile agent information home to the base station.
      */
-    private synchronized void sendCloneToBaseStation(MobileAgent mobileAgent) {
+    private synchronized void sendCloneToBaseStation(MobileAgent mobileAgent,
+                                                     SensorObject sender) {
         if (this.isBaseStation()) {
+            Node node = (Node) sender;
             if (!this.agentList.contains(mobileAgent)) {
                 this.agentList.add(mobileAgent);
+                node.sendMessage(new Message(this,
+                                             sender,
+                                             null,
+                                             "message received"));
             }
-            System.out.println(agentList);
         } else {
             Node node = getLowestRankedNode(this.neighbors);
             Message message = new Message(this,
@@ -252,6 +258,17 @@ public class Node implements SensorObject, Runnable {
                                           mobileAgent,
                                           "send clone home");
             node.sendMessage(message);
+        }
+    }
+
+    /**
+     * Updating the state of the node
+     */
+    private void updateState() {
+        if (this.getState().equalsIgnoreCase("yellow")) {
+            this.setState("red");
+        } else if (this.getState().equalsIgnoreCase("blue")) {
+            this.setState("yellow");
         }
     }
 
@@ -276,8 +293,7 @@ public class Node implements SensorObject, Runnable {
             this.setAgent(null);
             node.setAgent(mobileAgent);
             mobileAgent.setCurrentNode(node);
-            sendCloneToBaseStation(mobileAgent);
-            
+
             messageToSend = new Message(node,
                                         mobileAgent,
                                         null,
@@ -310,7 +326,9 @@ public class Node implements SensorObject, Runnable {
      * Performing a task on this specific thread.
      */
     @Override
-    public void run() { getMessages(); }
+    public void run() {
+        System.out.println(this.getName() + " thread has started");
+        getMessages(); }
 }
 
 

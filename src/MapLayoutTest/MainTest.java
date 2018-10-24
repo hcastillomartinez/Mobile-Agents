@@ -43,6 +43,7 @@ public class MainTest {
                 MobileAgent mobileAgent = new MobileAgent(queue,
                                                           id,
                                                           n,
+                                                          true,
                                                           true);
                 threads.add(new Thread(mobileAgent));
             }

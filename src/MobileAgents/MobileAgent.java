@@ -13,21 +13,26 @@ public class MobileAgent implements SensorObject, Runnable {
     private BlockingQueue<Message> queue;
     private long id;
     private Node currentNode;
-    private boolean walker;
+    private boolean walker, alive;
     
     /**
      * Constructor for the MobileAgent class that has a unique id.
      * @param id, unique identifier
      * @param queue, the list of tasks to perform
+     * @param currentNode, node that the mobile agent resides on
+     * @param walker, status of if the agent is stationary or mobile
+     * @param alive, health status of the agent
      */
     public MobileAgent(BlockingQueue<Message> queue,
                        long id,
                        Node currentNode,
-                       boolean walker) {
+                       boolean walker,
+                       boolean alive) {
         this.queue = queue;
         this.id = id;
         this.currentNode = currentNode;
         this.walker = walker;
+        this.alive = alive;
     }
 
     /**
@@ -53,7 +58,7 @@ public class MobileAgent implements SensorObject, Runnable {
      * Walking the nodes in the graph.
      */
     private void checkNode() {
-        while (!this.currentNode.getState().equalsIgnoreCase("red")) {
+        while (alive) {
             if (this.currentNode.getState().equalsIgnoreCase("yellow")) {
                 setWalkerStatus();
                 createMessageForNode("clone");
@@ -67,7 +72,7 @@ public class MobileAgent implements SensorObject, Runnable {
 
     /**
      * Function to create the specified message.
-     * @param messageCode phrase to send
+     * @param messageCode, phrase to send
      */
     private synchronized void createMessageForNode(String messageCode){
         Message message;
@@ -95,6 +100,8 @@ public class MobileAgent implements SensorObject, Runnable {
 
         if (messageDetail.equalsIgnoreCase("agent present")) {
             createMessageForNode("is agent status");
+        } else if (messageDetail.equalsIgnoreCase("dead")) {
+            this.alive = false;
         }
     }
 
@@ -117,7 +124,7 @@ public class MobileAgent implements SensorObject, Runnable {
     @Override
     public void getMessages() {
         try {
-            Thread.sleep(500);
+            Thread.sleep(250);
             analyzeMessage(this.queue.take());
         } catch (InterruptedException ie) {
             ie.printStackTrace();

@@ -29,6 +29,7 @@ public class Coordinator extends Application {
                 MobileAgent mobileAgent = new MobileAgent(queue,
                                                           Math.abs(id),
                                                           n,
+                                                          true,
                                                           true);
                 n.setAgent(mobileAgent);
                 mobileAgent.setCurrentNode(n);
@@ -48,8 +49,8 @@ public class Coordinator extends Application {
 
     @Override
     public void start(Stage primaryStage){
-     display.createGUI(primaryStage);
-     beginSim();
+        display.createGUI(primaryStage);
+        beginSim();
     }
     
     public static void main(String[]args){
