@@ -56,8 +56,11 @@ public class Display {
     public void update(List<Circle> circleList){
         for(Circle circle: circleList){
             Node n=circleToNode(this.nodes,circle.getId());
-            if(n.getAgent()==null) circle.setFill(Paint.valueOf(n.getState()));
-            else circle.setFill(Color.GREEN);
+            if(n.getAgent()==null){
+                circle.setFill(Paint.valueOf(n.getState()));
+                circle.setStroke(Color.BLACK);
+            }
+            else circle.setStroke(Color.GREEN);
         }
     }
 
@@ -76,6 +79,7 @@ public class Display {
         for(Iterator<Node> n=nodes.iterator();n.hasNext();){
             Node node=n.next();
                 Circle circle = new Circle(15, Color.valueOf(node.getState()));
+                circle.setStrokeWidth(3.5);
                 circle.setStroke(Color.BLACK);
                 circle.setId(node.getName());
                 circle.setCenterX(node.getX()*50);
