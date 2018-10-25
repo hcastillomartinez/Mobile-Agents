@@ -54,7 +54,6 @@ public class Display {
             public void run() {
                 update(circleList);
 
-//                System.out.println("update");
             }
         },1,1);
         Scene scene=new Scene(root);
@@ -70,9 +69,8 @@ public class Display {
             Node n=circleToNode(this.nodes,circle.getId());
             circle.setFill(Paint.valueOf(n.getState()));
 //            System.out.println(n.getState());
-            
             if(n.getAgent()==null){
-                circle.setStroke(Paint.valueOf(n.getState()));
+                circle.setStroke(Color.BLACK);
             }
             else circle.setStroke(Color.GREEN);
         }

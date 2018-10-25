@@ -19,6 +19,7 @@ public class Coordinator extends Application {
             "/src/MapLayoutTest/GraphTest";
     GraphReader gr = new GraphReader(new File(fileName));
     HashMap<Node, ArrayList<Node>> map = gr.getGraph();
+
     Display display=new Display(map.keySet());
     
     public void beginSim(){
@@ -50,6 +51,10 @@ public class Coordinator extends Application {
     public void start(Stage primaryStage){
         display.createGUI(primaryStage);
         beginSim();
+    }
+    @Override
+    public void stop(){
+        System.exit(0);
     }
     
     public static void main(String[]args){
