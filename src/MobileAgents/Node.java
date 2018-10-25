@@ -367,12 +367,11 @@ public class Node implements SensorObject, Runnable {
      */
     private synchronized Node getLowestRankedNode(List<Node> list) {
         Node lowerRankNode = null;
-        
-        for (Node nodeCheck: list) {
-            if (lowerRankNode == null) {
-                lowerRankNode = nodeCheck;
-            } else if (lowerRankNode.getLevel() > nodeCheck.getLevel()) {
-                lowerRankNode = nodeCheck;
+        Collections.sort(list,new BestOption());
+        for(Node n: list){
+            if(!n.getState().equals("red")){
+                lowerRankNode=n;
+                break;
             }
         }
         return lowerRankNode;
