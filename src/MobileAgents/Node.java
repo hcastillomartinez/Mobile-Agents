@@ -163,6 +163,7 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void analyzeMessage(Message message) {
         String messageString = message.getDetailedMessage();
+        System.out.println(message.toString());
         
         if (messageString.equalsIgnoreCase("is agent present")) {
             checkNodeForRandomWalk(message);
@@ -340,6 +341,18 @@ public class Node implements SensorObject, Runnable {
             System.out.println("here with time = " +
                                    (Math.abs(time - presentTime)));
             this.time = presentTime;
+            if (getState().equalsIgnoreCase("yellow")) {
+                setState("red");
+                for (Node n: neighbors) {
+                    if (!n.getState().equalsIgnoreCase("red") &&
+                        !n.getState().equalsIgnoreCase("blue")) {
+                        setState("red");
+                    } else if (!n.getState().equalsIgnoreCase("red") &&
+                        !n.getState().equalsIgnoreCase("yellow")) {
+                        setState("yellow");
+                    }
+                }
+            }
         }
     }
 
@@ -349,6 +362,7 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void run() {
         while(!state.equalsIgnoreCase("red")){
+            updateState(time);
             getMessages();
         }
         removeClone(agent, this);
