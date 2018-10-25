@@ -120,6 +120,7 @@ public class GraphReader {
         }
         
         if (!inKeys) {
+            // look back here and check out the node for check time
             this.graph.put(new Node(new LinkedBlockingQueue<>(1),
                                     newNodeX,
                                     newNodeY,
