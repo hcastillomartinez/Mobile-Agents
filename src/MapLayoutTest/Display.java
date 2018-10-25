@@ -1,10 +1,14 @@
 package MapLayoutTest;
 
+//import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import MobileAgents.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -19,6 +23,8 @@ import javafx.stage.Stage;
 public class Display {
     private AnchorPane root=new AnchorPane();
     private Pane pane=new Pane();
+//    private BorderPane bp=new BorderPane();
+    private ScrollPane child =new ScrollPane();
     private Set<Node> nodes;
 
     public Display(Set<Node> n){
@@ -27,11 +33,15 @@ public class Display {
 
     public void createGUI(Stage primaryStage){
         int circles=nodes.size();
-        root.setPrefSize(circles*50,circles*50);
-        pane.setPrefSize(circles*50,(circles*50)-200);
-        pane.setLayoutX(25);
-        pane.setLayoutY(100);
-        root.getChildren().add(pane);
+        root.setPrefSize(500,500);
+        pane.setPrefSize(circles*50,circles*50);
+        child.setPrefSize(500,350);
+        child.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        child.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        child.setLayoutX(5);
+        child.setLayoutY(50);
+        root.getChildren().add(child);
+        child.setContent(pane);
         List<Circle> circleList=new ArrayList<>();
         List<Line> lineList=new ArrayList<>();
         addNodes(circleList);
@@ -43,7 +53,8 @@ public class Display {
             @Override
             public void run() {
                 update(circleList);
-                System.out.println("update");
+
+//                System.out.println("update");
             }
         },1,1);
         Scene scene=new Scene(root);
@@ -82,8 +93,8 @@ public class Display {
                 circle.setStrokeWidth(3.5);
                 circle.setStroke(Color.BLACK);
                 circle.setId(node.getName());
-                circle.setCenterX(node.getX()*50);
-                circle.setCenterY(node.getY()*50);
+                circle.setCenterX(node.getX()*50+circle.getRadius()+20);
+                circle.setCenterY(node.getY()*50+circle.getRadius()+20);
                 circleList.add(circle);
         }
     }
