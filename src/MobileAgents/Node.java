@@ -12,7 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Node implements SensorObject, Runnable {
     
     private String name;
-    private long time;
+    private long time = 0;
     private BlockingQueue<Message> queue;
     private String state;
     private int x, y;
@@ -181,7 +181,7 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void analyzeMessage(Message message) {
         String messageString = message.getDetailedMessage();
-        System.out.println(message.toString());
+        System.out.println(message.toString() + " here");
         
         if (messageString.equalsIgnoreCase("is agent present")) {
             checkNodeForRandomWalk(message);
@@ -280,16 +280,17 @@ public class Node implements SensorObject, Runnable {
      * sync
      */
     private synchronized void sendCloneToBaseStation(MobileAgent mobileAgent,
-                                         SensorObject sender) {
+                                                     SensorObject sender) {
+        System.out.println(this.queue);
         if (this.isBaseStation()) {
             Node node = (Node) sender;
             if (!this.agentList.contains(mobileAgent)) {
                 this.agentList.add(mobileAgent);
-                node.sendMessage(new Message(this,
-                                             sender,
-                                             null,
-                                             "message received"));
             }
+            mobileAgent.sendMessage(new Message(this,
+                                                sender,
+                                                null,
+                                                "message received"));
         } else {
             Node node = getLowestRankedNode(this.neighbors);
             Message message = new Message(this,
@@ -354,21 +355,15 @@ public class Node implements SensorObject, Runnable {
      * Updating the state of the node
      */
     private synchronized void updateState(long currentTime) {
-        long presentTime = System.currentTimeMillis();
-        if (Math.abs(time - presentTime) > 2000) {
-            System.out.println("here with time = " +
-                                   (Math.abs(time - presentTime)));
-            this.time = presentTime;
-            if (getState().equalsIgnoreCase("yellow")) {
-                setState("red");
-                for (Node n: neighbors) {
-                    if (!n.getState().equalsIgnoreCase("red") &&
-                        !n.getState().equalsIgnoreCase("blue")) {
-                        setState("red");
-                    } else if (!n.getState().equalsIgnoreCase("red") &&
-                        !n.getState().equalsIgnoreCase("yellow")) {
-                        setState("yellow");
-                    }
+        if (getState().equalsIgnoreCase("yellow")) {
+            setState("red");
+            for (Node n: neighbors) {
+                if (!n.getState().equalsIgnoreCase("red") &&
+                    !n.getState().equalsIgnoreCase("blue")) {
+                    setState("red");
+                } else if (!n.getState().equalsIgnoreCase("red") &&
+                    !n.getState().equalsIgnoreCase("yellow")) {
+                    setState("yellow");
                 }
             }
         }
@@ -379,8 +374,16 @@ public class Node implements SensorObject, Runnable {
      */
     @Override
     public void run() {
+        long presentTime;
         while(!state.equalsIgnoreCase("red")){
-            updateState(time);
+            presentTime = System.currentTimeMillis();
+            if (Math.abs(presentTime - time) >= 2000) {
+                time = presentTime;
+                sendMessage(new Message(this,
+                                        this,
+                                        this.agent,
+                                        "update state"));
+            }
             getMessages();
         }
         removeClone(agent, this);
