@@ -143,10 +143,10 @@ public class MobileAgent implements SensorObject, Runnable {
         while (alive) {
             present = System.currentTimeMillis();
             if (Math.abs(time - present) >= 500) {
-                System.out.println(toString());
                 time = present;
 
-                if (currentNode.getState().equalsIgnoreCase("yellow")) {
+                if (currentNode.getState().equalsIgnoreCase("yellow") &&
+                    walker) {
                     setWalkerStatus();
                     createMessageForNode("clone");
                 } else if (currentNode.getState().equalsIgnoreCase("red")) {
@@ -158,8 +158,6 @@ public class MobileAgent implements SensorObject, Runnable {
                 }
                 getMessages();
             }
-//            createMessageForNode("is agent present");
-//            getMessages();
         }
         System.out.println(toString() + " thread has stopped --------");
     }

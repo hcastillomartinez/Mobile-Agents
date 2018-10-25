@@ -71,21 +71,23 @@ public class Message {
             senderHolder = (Node) sender;
             if (this.receiver.getClass().equals(Node.class)) {
                 return "(Sender = " + senderHolder.getName() + ", Receiver = " +
-                    ((Node) receiver).getName() + ": " + detailedMessage + ")";
+                    ((Node) receiver).getName() + ": " + detailedMessage + " " +
+                    this.clonedAgent + ")";
             } else {
                 return "(Sender = " + senderHolder.getName() + ", Receiver = " +
                     ((MobileAgent) receiver).getId() + ": " + detailedMessage
-                    + ")";
+                    + " " + this.clonedAgent + ")";
             }
         } else {
             senderMAHolder = (MobileAgent) sender;
             if (this.receiver.getClass().equals(Node.class)) {
                 return "(Sender = " + senderMAHolder.getId() + ", Receiver = " +
-                    ((Node) receiver).getName() + ": " + detailedMessage + ")";
+                    ((Node) receiver).getName() + ": " + detailedMessage + " " +
+                    this.clonedAgent + ")";
             } else {
                 return "(Sender = " + senderMAHolder.getId() + ", Receiver = " +
                     ((MobileAgent) receiver).getId() + ": " + detailedMessage
-                    + ")";
+                    + " " + this.clonedAgent + ")";
             }
         }
     }

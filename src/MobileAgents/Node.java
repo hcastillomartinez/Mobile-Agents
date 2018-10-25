@@ -47,6 +47,33 @@ public class Node implements SensorObject, Runnable {
         this.pathsBack = new ArrayList<>();
         this.time = System.currentTimeMillis();
     }
+    
+    // class to send the final message
+    private class FinalMessage extends Thread {
+        private Node node;
+        
+        private FinalMessage(Node node) {
+            this.node = node;
+        }
+        
+        // sending the final message
+        private void sendFinalMessage() {
+            try {
+                Thread.sleep(5000);
+                node.sendMessage(new Message(null,
+                                             node,
+                                             null,
+                                             "update neighbors to yellow"));
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }
+        }
+        
+        @Override
+        public void run() {
+            sendFinalMessage();
+        }
+    }
 
     /**
      * Returning the name of the node.
@@ -248,7 +275,7 @@ public class Node implements SensorObject, Runnable {
                 !n.agentPresent()) {
                 clone(n);
                 if (n.getState().equalsIgnoreCase("yellow")) {
-                    n.sendMessage(new Message(n,
+                    n.sendMessage(new Message(this,
                                               n,
                                               n.getAgent(),
                                               "clone"));
@@ -281,7 +308,7 @@ public class Node implements SensorObject, Runnable {
      */
     private synchronized void sendCloneToBaseStation(MobileAgent mobileAgent,
                                                      SensorObject sender) {
-        System.out.println(this.queue);
+        System.out.println(name + " = " + this.queue);
         if (this.isBaseStation()) {
             Node node = (Node) sender;
             if (!this.agentList.contains(mobileAgent)) {
@@ -355,17 +382,29 @@ public class Node implements SensorObject, Runnable {
      * Updating the state of the node
      */
     private synchronized void updateState(long currentTime) {
-        if (getState().equalsIgnoreCase("yellow")) {
-            setState("red");
-            for (Node n: neighbors) {
-                if (!n.getState().equalsIgnoreCase("red") &&
-                    !n.getState().equalsIgnoreCase("blue")) {
-                    setState("red");
-                } else if (!n.getState().equalsIgnoreCase("red") &&
-                    !n.getState().equalsIgnoreCase("yellow")) {
-                    setState("yellow");
-                }
+//        if (state.equalsIgnoreCase("yellow")) {
+//            setState("red");
+//            for (Node n: neighbors) {
+//                if (!state.equalsIgnoreCase("red") &&
+//                    !state.equalsIgnoreCase("blue")) {
+//                    setState("red");
+//                } else if (!state.equalsIgnoreCase("red") &&
+//                           !state.equalsIgnoreCase("yellow")) {
+//                    setState("yellow");
+//                }
+//            }
+//        }
+        FinalMessage finalMessage = new FinalMessage(this);
+        boolean fireFound = false;
+        for (Node n: neighbors) {
+            if (n.getState().equalsIgnoreCase("red") &&
+                !fireFound) {
+                fireFound = true;
             }
+        }
+        
+        if (fireFound) {
+            finalMessage.start();
         }
     }
 
@@ -377,13 +416,13 @@ public class Node implements SensorObject, Runnable {
         long presentTime;
         while(!state.equalsIgnoreCase("red")){
             presentTime = System.currentTimeMillis();
-            if (Math.abs(presentTime - time) >= 2000) {
-                time = presentTime;
-                sendMessage(new Message(this,
-                                        this,
-                                        this.agent,
-                                        "update state"));
-            }
+//            if (Math.abs(presentTime - time) >= 2000) {
+//                time = presentTime;
+//                sendMessage(new Message(this,
+//                                        this,
+//                                        this.agent,
+//                                        "update state"));
+//            }
             getMessages();
         }
         removeClone(agent, this);
