@@ -43,38 +43,32 @@ public class MobileAgent implements SensorObject, Runnable {
     
     /**
      * Setting the current node after a move.
+     * sync
      * @param node to change to
      */
-    public synchronized void setCurrentNode(Node node) {
+    public void setCurrentNode(Node node) {
         this.currentNode = node;
     }
     
     /**
      * Setting the walker to stop walking.
+     * sync
      */
-    public synchronized void setWalkerStatus() { this.walker = false; }
+    public void setWalkerStatus() { this.walker = false; }
 
     /**
      * Walking the nodes in the graph.
      */
     private void checkNode() {
-        while (alive) {
-            if (this.currentNode.getState().equalsIgnoreCase("yellow")) {
-                setWalkerStatus();
-                createMessageForNode("clone");
-            }
-            if (this.walker) {
-                createMessageForNode("is agent present");
-            }
-            getMessages();
-        }
+    
     }
 
     /**
      * Function to create the specified message.
+     * sync
      * @param messageCode, phrase to send
      */
-    private synchronized void createMessageForNode(String messageCode){
+    private void createMessageForNode(String messageCode){
         Message message;
         if (messageCode.equalsIgnoreCase("is agent status")) {
             message = new Message(this,
@@ -92,10 +86,11 @@ public class MobileAgent implements SensorObject, Runnable {
 
     /**
      * Analyzing the message from the sender
+     * sync
      * @param message, message to analyze from the sender
      */
     @Override
-    public synchronized void analyzeMessage(Message message) {
+    public void analyzeMessage(Message message) {
         String messageDetail = message.getDetailedMessage();
 
         if (messageDetail.equalsIgnoreCase("agent present")) {
@@ -124,7 +119,6 @@ public class MobileAgent implements SensorObject, Runnable {
     @Override
     public void getMessages() {
         try {
-            Thread.sleep(250);
             analyzeMessage(this.queue.take());
         } catch (InterruptedException ie) {
             ie.printStackTrace();
@@ -133,6 +127,7 @@ public class MobileAgent implements SensorObject, Runnable {
     
     /**
      * Overriding toString() to print out the agent
+     * sync
      * @return string for the agent
      */
     public synchronized String toString() {
@@ -144,7 +139,26 @@ public class MobileAgent implements SensorObject, Runnable {
      */
     @Override
     public void run() {
-        checkNode();
+        long time = System.currentTimeMillis(), present;
+        while (alive) {
+            present = System.currentTimeMillis();
+            if (Math.abs(time - present) >= 500) {
+                System.out.println(toString());
+                time = present;
+                
+                if (currentNode.getState().equalsIgnoreCase("yellow")) {
+                    setWalkerStatus();
+                    createMessageForNode("clone");
+                } else if (currentNode.getState().equalsIgnoreCase("red")) {
+                    alive = false;
+                }
+                
+                if (walker) {
+                    createMessageForNode("is agent present");
+                }
+                getMessages();
+            }
+        }
         System.out.println(toString() + " thread has stopped --------");
     }
 }

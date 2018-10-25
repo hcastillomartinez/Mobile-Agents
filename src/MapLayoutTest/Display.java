@@ -56,11 +56,15 @@ public class Display {
     public void update(List<Circle> circleList){
         for(Circle circle: circleList){
             Node n=circleToNode(this.nodes,circle.getId());
-            if(n.getAgent()==null){
+    
+            if(!n.agentPresent()){
                 circle.setFill(Paint.valueOf(n.getState()));
-                circle.setStroke(Color.BLACK);
+                circle.setStroke(Paint.valueOf(n.getState()));
             }
-            else circle.setStroke(Color.GREEN);
+            else {
+                circle.setFill(Paint.valueOf(n.getState()));
+                circle.setStroke(Color.GREENYELLOW);
+            }
         }
     }
 
