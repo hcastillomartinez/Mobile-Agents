@@ -340,7 +340,6 @@ public class Node implements SensorObject, Runnable {
     private synchronized Node getLowestRankedNode(List<Node> list) {
         Node lowerRankNode = null;
         
-
         for (Node nodeCheck: list) {
             if (lowerRankNode == null) {
                 lowerRankNode = nodeCheck;
