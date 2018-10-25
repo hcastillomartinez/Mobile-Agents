@@ -1,6 +1,5 @@
 package MapLayoutTest;
 
-//import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -8,7 +7,6 @@ import MobileAgents.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -23,7 +21,6 @@ import javafx.stage.Stage;
 public class Display {
     private AnchorPane root=new AnchorPane();
     private Pane pane=new Pane();
-//    private BorderPane bp=new BorderPane();
     private ScrollPane child =new ScrollPane();
     private Set<Node> nodes;
 
@@ -48,6 +45,9 @@ public class Display {
         drawEdges(circleList,lineList);
         pane.getChildren().addAll(lineList);
         pane.getChildren().addAll(circleList);
+        for(Node n: this.nodes){
+            System.out.println(n.getName()+ ": Level- "+n.getLevel());
+        }
         Timer t=new Timer();
         t.schedule(new TimerTask() {
             @Override
@@ -67,12 +67,13 @@ public class Display {
     public void update(List<Circle> circleList){
         for(Circle circle: circleList){
             Node n=circleToNode(this.nodes,circle.getId());
+            circle.setFill(Paint.valueOf(n.getState()));
             if(n.getAgent()==null){
-                circle.setFill(Paint.valueOf(n.getState()));
                 circle.setStroke(Color.BLACK);
             }
             else circle.setStroke(Color.GREEN);
         }
+
     }
 
     private Node circleToNode(Set<Node> keySet,String name){
@@ -89,13 +90,13 @@ public class Display {
     private void addNodes(List<Circle> circleList){
         for(Iterator<Node> n=nodes.iterator();n.hasNext();){
             Node node=n.next();
-                Circle circle = new Circle(15, Color.valueOf(node.getState()));
-                circle.setStrokeWidth(3.5);
-                circle.setStroke(Color.BLACK);
-                circle.setId(node.getName());
-                circle.setCenterX(node.getX()*50+circle.getRadius()+20);
-                circle.setCenterY(node.getY()*50+circle.getRadius()+20);
-                circleList.add(circle);
+            Circle circle = new Circle(15, Color.valueOf(node.getState()));
+            circle.setStrokeWidth(3.5);
+            circle.setStroke(Color.BLACK);
+            circle.setId(node.getName());
+            circle.setCenterX(node.getX()*50+circle.getRadius()+20);
+            circle.setCenterY(node.getY()*50+circle.getRadius()+20);
+            circleList.add(circle);
         }
     }
 

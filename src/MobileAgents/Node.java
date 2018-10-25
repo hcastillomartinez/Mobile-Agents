@@ -23,7 +23,8 @@ public class Node implements SensorObject, Runnable {
     private List<MobileAgent> agentList;
     private MobileAgent agent;
     private boolean baseStation;
-    
+    private int level;
+
     /**
      * Constructor for the Node class.
      * @param queue, concurrent queue for storing events
@@ -44,6 +45,7 @@ public class Node implements SensorObject, Runnable {
         this.name = name;
         this.baseStation = false;
         this.agent = null;
+        this.level=0;
         this.pathsBack = new ArrayList<>();
     }
 
@@ -52,6 +54,13 @@ public class Node implements SensorObject, Runnable {
      * @return name of the node
      */
     public String getName() { return this.name; }
+
+    public void setLevel(int lvl){
+        this.level=lvl;
+    }
+    public int getLevel(){
+        return this.level;
+    }
 
     /**
      * Returning the list of the neighbor nodes.

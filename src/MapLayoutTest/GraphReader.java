@@ -1,15 +1,10 @@
 package MapLayoutTest;
 
-import MobileAgents.Message;
 import MobileAgents.Node;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Scanner;
-import java.util.concurrent.BlockingQueue;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -33,6 +28,7 @@ public class GraphReader {
         this.file = file;
         this.graph = new HashMap<>();
         readInGraph();
+        setLevels();
     }
     
     /**
@@ -173,4 +169,33 @@ public class GraphReader {
      * @return graph of the layout
      */
     public HashMap<Node, ArrayList<Node>> getGraph() { return this.graph; }
+
+    private void setLevels(){
+        while(levelDone()==false){
+         for(Node n: this.graph.keySet()){
+             setChildrenLevel(n);
+         }
+        }
+    }
+    private boolean levelDone(){
+        for(Node n: this.graph.keySet()){
+            if(n.getLevel()==0 && !n.isBaseStation())return false;
+        }
+        return true;
+    }
+    private void setChildrenLevel(Node root){
+        Collection<Node> collection=root.getNeighbors();
+        //roots level hasn't been set yet
+        if(root.getLevel()==0 && !root.isBaseStation()){
+            return;
+        }
+        else{
+            for(Node n: collection){
+                //checks if children have had their level set yet
+                if(n.getLevel()==0 && !n.isBaseStation()){
+                    n.setLevel(root.getLevel()+1);
+                }
+            }
+        }
+    }
 }
