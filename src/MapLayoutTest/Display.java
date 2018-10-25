@@ -65,9 +65,11 @@ public class Display {
 
 
     public void update(List<Circle> circleList){
+        System.out.println("new update");
         for(Circle circle: circleList){
             Node n=circleToNode(this.nodes,circle.getId());
             circle.setFill(Paint.valueOf(n.getState()));
+            System.out.println(n.getState());
             if(n.getAgent()==null){
                 circle.setStroke(Color.BLACK);
             }

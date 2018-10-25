@@ -34,7 +34,6 @@ public class Coordinator extends Application {
                 n.setAgent(mobileAgent);
                 mobileAgent.setCurrentNode(n);
                 threads.add(new Thread(mobileAgent));
-                if(false);
             }
         }
 

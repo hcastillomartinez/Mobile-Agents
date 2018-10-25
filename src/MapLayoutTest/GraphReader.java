@@ -170,6 +170,10 @@ public class GraphReader {
      */
     public HashMap<Node, ArrayList<Node>> getGraph() { return this.graph; }
 
+    /**
+     * Continually checks the nodes for their level and until all levels have been
+     * set is when it stops.
+     */
     private void setLevels(){
         while(levelDone()==false){
          for(Node n: this.graph.keySet()){
@@ -177,12 +181,24 @@ public class GraphReader {
          }
         }
     }
+
+    /**
+     * Checks the nodes in the graph and checks if they
+     * all have their levels set yet
+     * @return
+     */
     private boolean levelDone(){
         for(Node n: this.graph.keySet()){
             if(n.getLevel()==0 && !n.isBaseStation())return false;
         }
         return true;
     }
+
+    /**
+     * Goes through children of a node and if their levels have not be
+     * set yet, it does.
+     * @param root, Node of which children are being updated
+     */
     private void setChildrenLevel(Node root){
         Collection<Node> collection=root.getNeighbors();
         //roots level hasn't been set yet

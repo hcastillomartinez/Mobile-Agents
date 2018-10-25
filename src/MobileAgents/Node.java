@@ -55,9 +55,18 @@ public class Node implements SensorObject, Runnable {
      */
     public String getName() { return this.name; }
 
+    /**
+     * Sets level of a node
+     * @param lvl, int that is level of node
+     */
     public void setLevel(int lvl){
         this.level=lvl;
     }
+
+    /**
+     * Gets the Level of the node.
+     * @return Returns an int
+     */
     public int getLevel(){
         return this.level;
     }
