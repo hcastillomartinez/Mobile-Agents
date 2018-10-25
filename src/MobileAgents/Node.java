@@ -344,7 +344,7 @@ public class Node implements SensorObject, Runnable {
         for (Node nodeCheck: list) {
             if (lowerRankNode == null) {
                 lowerRankNode = nodeCheck;
-            } else if (lowerRankNode.getX() > nodeCheck.getX()) {
+            } else if (lowerRankNode.getLevel() > nodeCheck.getLevel()) {
                 lowerRankNode = nodeCheck;
             }
         }
