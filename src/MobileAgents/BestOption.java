@@ -9,8 +9,8 @@ import java.util.*;
 public class BestOption implements Comparator<Node> {
     @Override
     public int compare(Node a, Node b){
-        if(b.getLevel()<a.getLevel())return 1;
-        else if(a.getLevel()>a.getLevel())return -1;
+        if(a.getLevel()<b.getLevel())return -1;
+        else if(a.getLevel()<b.getLevel())return 1;
         else return 0;
     }
 }
