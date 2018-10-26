@@ -337,16 +337,23 @@ public class Node implements SensorObject, Runnable {
      * @param list, of the neighbor nodes
      * @return lowest ranked neighbor
      */
-    private synchronized Node getLowestRankedNode(List<Node> list) {
+    public synchronized Node getLowestRankedNode(List<Node> list) {
         Node lowerRankNode = null;
         Collections.sort(list,new BestOption());
         for(Node n: list){
-            if(!n.getState().equals("red")){
+            if(n.getState().equals("blue") || n.getState().equals("yellow")){
                 lowerRankNode=n;
                 break;
             }
         }
+
         return lowerRankNode;
+    }
+
+    @Override
+    public String toString(){
+        String string="Name: ("+this.name+") Level: "+this.level+" State: "+this.state;
+        return string;
     }
 
     /**

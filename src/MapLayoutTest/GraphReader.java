@@ -186,7 +186,7 @@ public class GraphReader {
     /**
      * Checks the nodes in the graph and checks if they
      * all have their levels set yet
-     * @return
+     * @return Returns true when done
      */
     private boolean levelDone(){
         for(Node n: this.graph.keySet()){
