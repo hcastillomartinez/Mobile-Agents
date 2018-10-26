@@ -46,7 +46,7 @@ public class Display {
         pane.getChildren().addAll(lineList);
         pane.getChildren().addAll(circleList);
         for(Node n: this.nodes){
-            System.out.println(n.getName()+ ": Level- "+n.getLevel());
+            System.out.println(n.retrieveName()+ ": Level- "+n.getLevel());
         }
         Timer t=new Timer();
         t.schedule(new TimerTask() {
@@ -79,7 +79,7 @@ public class Display {
 
     private Node circleToNode(Set<Node> keySet,String name){
         for(Node node:keySet){
-            if(node.getName().equals(name))return node;
+            if(node.retrieveName().equals(name))return node;
         }
         return null;
     }
@@ -94,7 +94,7 @@ public class Display {
             Circle circle = new Circle(15, Color.valueOf(node.getState()));
             circle.setStrokeWidth(3.5);
             circle.setStroke(Color.BLACK);
-            circle.setId(node.getName());
+            circle.setId(node.retrieveName());
             circle.setCenterX(node.getX()*50+circle.getRadius()+20);
             circle.setCenterY(node.getY()*50+circle.getRadius()+20);
             circleList.add(circle);
@@ -122,11 +122,11 @@ public class Display {
         Circle circle1;
         Circle circle2;
         for (Node node : this.nodes) { //keySet
-            circle1 = nodeToCircle(circleList, node.getName());
+            circle1 = nodeToCircle(circleList, node.retrieveName());
             List<Node> neighbors = node.getNeighbors();
             for (Node n : neighbors) {
                 Line line = new Line();
-                circle2 = nodeToCircle(circleList, n.getName());
+                circle2 = nodeToCircle(circleList, n.retrieveName());
                 line.startXProperty().bind(circle1.centerXProperty());
                 line.startYProperty().bind(circle1.centerYProperty());
                 line.endXProperty().bind(circle2.centerXProperty());

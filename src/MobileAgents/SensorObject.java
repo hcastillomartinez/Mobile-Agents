@@ -14,7 +14,7 @@ public interface SensorObject {
     
     /**
      * Getting the next message in the queue.
-     * @return message
+     * @return message from the queue
      */
     void getMessages();
 
@@ -22,4 +22,10 @@ public interface SensorObject {
      * Function used for analyzing the messages
      */
     void analyzeMessage(Message message);
+    
+    /**
+     * Getting the string name representation of the SensorObject
+     * @return name of the object
+     */
+    String retrieveName();
 }
