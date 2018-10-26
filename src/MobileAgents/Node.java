@@ -52,6 +52,7 @@ public class Node implements SensorObject, Runnable {
     private class FinalMessage extends Thread {
         private Node node;
         
+        // constructor for the class
         private FinalMessage(Node node) {
             this.node = node;
         }
