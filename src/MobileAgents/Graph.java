@@ -51,7 +51,7 @@ public class Graph {
         for(Node n: keys){
             try{
                 List<Node> neighbor = n.getNeighbors();
-                System.out.println("root: " + n.getName() + " children: "
+                System.out.println("root: " + n.retrieveName() + " children: "
                                        + neighborString(neighbor));
             } catch(NullPointerException np) {
                 np.printStackTrace();
@@ -67,7 +67,7 @@ public class Graph {
     public String neighborString(List<Node> temp) {
         String names = "";
         for(Node n: temp){
-            names += " " + n.getName();
+            names += " " + n.retrieveName();
         }
         return names;
     }

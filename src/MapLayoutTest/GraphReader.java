@@ -92,13 +92,13 @@ public class GraphReader {
                                   int fireStartX,
                                   int fireStartY) {
         for (Node n: this.graph.keySet()) {
-            if (n.getName().equalsIgnoreCase(makeNodeName(baseX,
-                                                          baseY))) {
+            if (n.retrieveName().equalsIgnoreCase(makeNodeName(baseX,
+                                                               baseY))) {
                 n.setBaseStation();
             }
         
-            if (n.getName().equalsIgnoreCase(makeNodeName(fireStartX,
-                                                          fireStartY))) {
+            if (n.retrieveName().equalsIgnoreCase(makeNodeName(fireStartX,
+                                                               fireStartY))) {
                 n.setState("red");
                 for (Node node: n.getNeighbors()) {
                     node.setState("yellow");
@@ -114,7 +114,7 @@ public class GraphReader {
     private void placeNodeInGraph(String name, int newNodeX, int newNodeY) {
         boolean inKeys = false;
         for (Node n: this.graph.keySet()) {
-            if (n.getName().equalsIgnoreCase(name)) {
+            if (n.retrieveName().equalsIgnoreCase(name)) {
                 inKeys = true;
             }
         }
@@ -136,11 +136,11 @@ public class GraphReader {
     private void placeEdgesInGraph(String beginNodeName, String endNodeName) {
         Node startNode = null, connectingNode = null;
         for (Node n: this.graph.keySet()) {
-            if (n.getName().equalsIgnoreCase(beginNodeName)) {
+            if (n.retrieveName().equalsIgnoreCase(beginNodeName)) {
                 startNode = n;
             }
             
-            if (n.getName().equalsIgnoreCase(endNodeName)) {
+            if (n.retrieveName().equalsIgnoreCase(endNodeName)) {
                 connectingNode = n;
             }
         }

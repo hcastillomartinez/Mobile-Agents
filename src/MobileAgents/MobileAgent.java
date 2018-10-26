@@ -57,13 +57,6 @@ public class MobileAgent implements SensorObject, Runnable {
     public void setWalkerStatus() { this.walker = false; }
 
     /**
-     * Walking the nodes in the graph.
-     */
-    private void checkNode() {
-    
-    }
-
-    /**
      * Function to create the specified message.
      * sync
      * @param messageCode, phrase to send
@@ -130,8 +123,8 @@ public class MobileAgent implements SensorObject, Runnable {
      * sync
      * @return string for the agent
      */
-    public synchronized String toString() {
-        return "" + this.getId() + " " + this.currentNode.getName();
+    public synchronized String retrieveName() {
+        return "" + this.getId() + "";
     }
 
     /**
@@ -140,26 +133,30 @@ public class MobileAgent implements SensorObject, Runnable {
     @Override
     public void run() {
         long time = System.currentTimeMillis(), present;
-        while (alive) {
+    
+        while (this.alive) {
             present = System.currentTimeMillis();
             if (Math.abs(time - present) >= 500) {
                 time = present;
+                System.out.println("here");
 
-                if (currentNode.getState().equalsIgnoreCase("yellow") &&
-                    walker) {
-                    setWalkerStatus();
-                    createMessageForNode("clone");
-                } else if (currentNode.getState().equalsIgnoreCase("red")) {
-                    alive = false;
-                }
-
-                if (walker) {
-                    createMessageForNode("is agent present");
-                }
+//                if (currentNode.getState().equalsIgnoreCase("yellow") ||
+//                    currentNode.getState().equalsIgnoreCase("red")) {
+//                    if (this.walker) {
+//                        setWalkerStatus();
+//                    }
+//                    createMessageForNode("clone");
+//                } else if (currentNode.getState().equalsIgnoreCase("red")) {
+//                    this.alive = false;
+//                }
+//
+//                if (this.walker) {
+//                    createMessageForNode("is agent present");
+//                }
+                createMessageForNode("is agent present");
                 getMessages();
             }
         }
-        System.out.println(toString() + " thread has stopped --------");
     }
 }
 

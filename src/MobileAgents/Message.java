@@ -64,31 +64,7 @@ public class Message {
      */
     @Override
     public String toString() {
-        Node senderHolder = null, receiverHolder = null;
-        MobileAgent senderMAHolder = null, receiverMAHolder = null;
-        
-        if (this.sender.getClass().equals(Node.class)) {
-            senderHolder = (Node) sender;
-            if (this.receiver.getClass().equals(Node.class)) {
-                return "(Sender = " + senderHolder.getName() + ", Receiver = " +
-                    ((Node) receiver).getName() + ": " + detailedMessage + " " +
-                    this.clonedAgent + ")";
-            } else {
-                return "(Sender = " + senderHolder.getName() + ", Receiver = " +
-                    ((MobileAgent) receiver).getId() + ": " + detailedMessage
-                    + " " + this.clonedAgent + ")";
-            }
-        } else {
-            senderMAHolder = (MobileAgent) sender;
-            if (this.receiver.getClass().equals(Node.class)) {
-                return "(Sender = " + senderMAHolder.getId() + ", Receiver = " +
-                    ((Node) receiver).getName() + ": " + detailedMessage + " " +
-                    this.clonedAgent + ")";
-            } else {
-                return "(Sender = " + senderMAHolder.getId() + ", Receiver = " +
-                    ((MobileAgent) receiver).getId() + ": " + detailedMessage
-                    + " " + this.clonedAgent + ")";
-            }
-        }
+        return ("sender = " + sender.retrieveName() + ", receiver = " +
+            receiver.retrieveName() + " : " + detailedMessage + " " + clonedAgent);
     }
 }
