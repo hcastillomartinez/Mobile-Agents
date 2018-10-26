@@ -48,6 +48,48 @@ public class Node implements SensorObject, Runnable {
         this.time = System.currentTimeMillis();
     }
 
+    // class to send the final message
+    private class FinalMessage extends Thread {
+        private Node node;
+        
+        private FinalMessage(Node node) {
+            this.node = node;
+        }
+        
+        /**
+         * Overriding the run method to create a thread that has a delay to
+         * make the fire spread after a certain amount of time.
+         */
+        @Override
+        public synchronized void run() {
+            try {
+                Thread.sleep(5000);
+                this.node.setState("red");
+                this.node.sendOrRemoveClone(this.node.agent,
+                                            node,
+                                            "remove clone");
+                this.node.setAgent(null);
+                
+                for (Node n: this.node.getNeighbors()) {
+                    if (!n.getState().equalsIgnoreCase("red")) {
+                        n.sendMessage(new Message(this.node,
+                                                  n,
+                                                  null,
+                                                  "update to new state"));
+                    }
+                }
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Returning the name of the node.
+     * @return name of the node
+     */
+    public String retrieveName() { return this.name; }
+
     /**
      * Returning the name of the node.
      * @return name of the node
@@ -140,7 +182,7 @@ public class Node implements SensorObject, Runnable {
      * Returning the status of whether the node has an agent present.
      * @return agentPresent, true if there is an agent and false otherwise
      */
-    public synchronized boolean agentPresent() {
+    public boolean agentPresent() {
         if (this.agent == null) {
             return false;
         }
@@ -152,7 +194,7 @@ public class Node implements SensorObject, Runnable {
      * @param message, message
      */
     @Override
-    public synchronized void sendMessage(Message message) {
+    public void sendMessage(Message message) {
         try {
             this.queue.put(message);
         } catch (InterruptedException ie) {
@@ -172,7 +214,7 @@ public class Node implements SensorObject, Runnable {
             ie.printStackTrace();
         }
     }
-    
+
     /**
      * Analyzing where to send the message.
      * @param message, message to analyze
@@ -181,28 +223,43 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void analyzeMessage(Message message) {
         String messageString = message.getDetailedMessage();
-        System.out.println(message.toString());
+    //        System.out.println(message.toString());
         
         if (messageString.equalsIgnoreCase("is agent present")) {
             checkNodeForRandomWalk(message);
         } else if (messageString.equalsIgnoreCase("clone")) {
             cloneAgents();
         } else if (messageString.equalsIgnoreCase("send clone home")) {
-            sendCloneToBaseStation(message.getClonedAgent(), this);
+            sendOrRemoveClone(message.getClonedAgent(),
+                              this,
+                              "send clone home");
         } else if (messageString.equalsIgnoreCase("remove clone")) {
-            removeClone(message.getClonedAgent(), this);
+            sendOrRemoveClone(message.getClonedAgent(),
+                              this,
+                              "remove clone");
         } else if (messageString.equalsIgnoreCase("update state")) {
             System.out.println(message.toString());
-            updateState(time);
+            updateState();
         } else if (messageString.equalsIgnoreCase("check state")) {
             checkState(message.getSender());
+        } else if (messageString.equalsIgnoreCase("update to new state")) {
+            makeNewState((Node) message.getReceiver());
+        }
+    }
+
+    /**
+     * Creating the new state for the node
+     */
+    private void makeNewState(Node node) {
+        if (node.getState().equalsIgnoreCase("blue")) {
+            setState("yellow");
         }
     }
     
     /**
      * Checking the state of the node
      */
-    private synchronized void checkState(SensorObject sensorObject) {
+    private void checkState(SensorObject sensorObject) {
         if (state.equalsIgnoreCase("blue")) {
             sensorObject.sendMessage(new Message(this,
                                                  sensorObject,
@@ -225,9 +282,8 @@ public class Node implements SensorObject, Runnable {
      * Creating the new Mobile Agent for the node.
      * sync
      * @param node, node to clone an agent on
-     * @return mobileAgent to give to the new node
      */
-    private synchronized void clone(Node node) {
+    private void clone(Node node) {
         long id = (new Random()).nextLong();
         MobileAgent mobileAgent = new MobileAgent(new LinkedBlockingQueue<>(1),
                                                   Math.abs(id),
@@ -237,41 +293,24 @@ public class Node implements SensorObject, Runnable {
         (new Thread(mobileAgent)).start();
         node.setAgent(mobileAgent);
     }
-    
+
     /**
      * Cloning agents on surrounding neighbors.
      * sync
      */
-    private synchronized void cloneAgents() {
+    private void cloneAgents() {
         for (Node n: this.getNeighbors()) {
             if (!n.getState().equalsIgnoreCase("red") &&
                 !n.agentPresent()) {
                 clone(n);
                 if (n.getState().equalsIgnoreCase("yellow")) {
-                    n.sendMessage(new Message(n,
+                    n.sendMessage(new Message(this,
                                               n,
                                               n.getAgent(),
                                               "clone"));
-                    sendCloneToBaseStation(n.getAgent(), n);
+                    sendOrRemoveClone(n.getAgent(), n, "send clone home");
                 }
             }
-        }
-    }
-    
-    /**
-     * Removing the agent from the base station agent list
-     * sync
-     */
-    private void removeClone(MobileAgent mobileAgent, SensorObject sender) {
-        if (this.isBaseStation()) {
-            this.agentList.remove(mobileAgent);
-        } else {
-            Node node = getLowestRankedNode(this.neighbors);
-            Message message = new Message(this,
-                                          node,
-                                          this.agent,
-                                          "remove clone");
-            node.sendMessage(message);
         }
     }
 
@@ -279,24 +318,19 @@ public class Node implements SensorObject, Runnable {
      * Sending the cloned mobile agent information home to the base station.
      * sync
      */
-    private synchronized void sendCloneToBaseStation(MobileAgent mobileAgent,
-                                         SensorObject sender) {
+    private void sendOrRemoveClone(MobileAgent mobileAgent,
+                                   SensorObject sender,
+                                   String command) {
         if (this.isBaseStation()) {
-            Node node = (Node) sender;
             if (!this.agentList.contains(mobileAgent)) {
                 this.agentList.add(mobileAgent);
-                node.sendMessage(new Message(this,
-                                             sender,
-                                             null,
-                                             "message received"));
             }
         } else {
             Node node = getLowestRankedNode(this.neighbors);
-            Message message = new Message(this,
-                                          node,
-                                          mobileAgent,
-                                          "send clone home");
-            node.sendMessage(message);
+            node.sendMessage(new Message(sender,
+                                         node,
+                                         mobileAgent,
+                                         command));
         }
     }
 
@@ -337,13 +371,13 @@ public class Node implements SensorObject, Runnable {
      * @param list, of the neighbor nodes
      * @return lowest ranked neighbor
      */
-    private synchronized Node getLowestRankedNode(List<Node> list) {
+    private Node getLowestRankedNode(List<Node> list) {
         Node lowerRankNode = null;
-        Collections.sort(list,new BestOption());
-        for(Node n: list){
-            if(!n.getState().equals("red")){
-                lowerRankNode=n;
-                break;
+        for (Node n: this.neighbors) {
+            if (lowerRankNode == null) {
+                lowerRankNode = n;
+            } else if (lowerRankNode.getLevel() > n.getLevel()) {
+                lowerRankNode = n;
             }
         }
         return lowerRankNode;
@@ -352,24 +386,18 @@ public class Node implements SensorObject, Runnable {
     /**
      * Updating the state of the node
      */
-    private synchronized void updateState(long currentTime) {
-        long presentTime = System.currentTimeMillis();
-        if (Math.abs(time - presentTime) > 2000) {
-            System.out.println("here with time = " +
-                                   (Math.abs(time - presentTime)));
-            this.time = presentTime;
-            if (getState().equalsIgnoreCase("yellow")) {
-                setState("red");
-                for (Node n: neighbors) {
-                    if (!n.getState().equalsIgnoreCase("red") &&
-                        !n.getState().equalsIgnoreCase("blue")) {
-                        setState("red");
-                    } else if (!n.getState().equalsIgnoreCase("red") &&
-                        !n.getState().equalsIgnoreCase("yellow")) {
-                        setState("yellow");
-                    }
-                }
+    private void updateState() {
+        boolean fireFound = false;
+        for (Node n: neighbors) {
+            if (n.getState().equalsIgnoreCase("red") &&
+                !fireFound) {
+                fireFound = true;
             }
+        }
+        
+        if (fireFound) {
+            FinalMessage finalMessage = new FinalMessage(this);
+            finalMessage.start();
         }
     }
 
@@ -378,11 +406,11 @@ public class Node implements SensorObject, Runnable {
      */
     @Override
     public void run() {
-        while(!state.equalsIgnoreCase("red")){
-            updateState(time);
+        while(!this.state.equalsIgnoreCase("red")) {
+            System.out.println(this.name + " = " + this.queue);
+            updateState();
             getMessages();
         }
-        removeClone(agent, this);
     }
 }
 
