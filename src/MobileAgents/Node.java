@@ -61,13 +61,19 @@ public class Node implements SensorObject, Runnable {
          * make the fire spread after a certain amount of time.
          */
         @Override
-        public synchronized void run() {
+        public void run() {
             try {
                 Thread.sleep(5000);
                 this.node.setState("red");
-                this.node.sendOrRemoveClone(this.node.agent,
-                                            node,
-                                            "remove clone");
+                if (this.node.agentPresent()) {
+                    this.node.agent.sendMessage(new Message(this.node,
+                                                            this.node.agent,
+                                                            null,
+                                                            "state changed"));
+                    this.node.sendOrRemoveClone(this.node.agent,
+                                                node,
+                                                "remove clone");
+                }
                 this.node.setAgent(null);
                 
                 for (Node n: this.node.getNeighbors()) {
@@ -223,7 +229,7 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void analyzeMessage(Message message) {
         String messageString = message.getDetailedMessage();
-    //        System.out.println(message.toString());
+            System.out.println(message.toString());
         
         if (messageString.equalsIgnoreCase("is agent present")) {
             checkNodeForRandomWalk(message);
@@ -238,7 +244,6 @@ public class Node implements SensorObject, Runnable {
                               this,
                               "remove clone");
         } else if (messageString.equalsIgnoreCase("update state")) {
-            System.out.println(message.toString());
             updateState();
         } else if (messageString.equalsIgnoreCase("check state")) {
             checkState(message.getSender());
@@ -308,8 +313,10 @@ public class Node implements SensorObject, Runnable {
                                               n,
                                               n.getAgent(),
                                               "clone"));
-                    sendOrRemoveClone(n.getAgent(), n, "send clone home");
                 }
+                sendOrRemoveClone(n.getAgent(),
+                                  n,
+                                  "send clone home");
             }
         }
     }
@@ -371,7 +378,7 @@ public class Node implements SensorObject, Runnable {
      * @param list, of the neighbor nodes
      * @return lowest ranked neighbor
      */
-    private Node getLowestRankedNode(List<Node> list) {
+    private synchronized Node getLowestRankedNode(List<Node> list) {
         Node lowerRankNode = null;
     
         //it was causing a deadlock issue when trying to send the nodes back
@@ -419,7 +426,6 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void run() {
         while(!this.state.equalsIgnoreCase("red")) {
-            System.out.println(this.name + " = " + this.queue);
             updateState();
             getMessages();
         }

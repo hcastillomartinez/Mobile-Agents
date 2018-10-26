@@ -90,6 +90,8 @@ public class MobileAgent implements SensorObject, Runnable {
             createMessageForNode("is agent status");
         } else if (messageDetail.equalsIgnoreCase("dead")) {
             this.alive = false;
+        } else if (messageDetail.equalsIgnoreCase("state changed")) {
+            createMessageForNode("clone");
         }
     }
 
@@ -136,21 +138,20 @@ public class MobileAgent implements SensorObject, Runnable {
     
         while (this.alive) {
             present = System.currentTimeMillis();
-            if (Math.abs(time - present) >= 3000) {
+            if (Math.abs(time - present) >= 1000) {
                 time = present;
-                System.out.println("here");
-
-                if (currentNode.getState().equalsIgnoreCase("yellow")) {
-                    if (this.walker) {
-                        setWalkerStatus();
-                    }
-                    createMessageForNode("clone");
-                } else if (currentNode.getState().equalsIgnoreCase("red")) {
-                    this.alive = false;
-                }
 
                 if (this.walker) {
-                    createMessageForNode("is agent present");
+                    if (this.currentNode.getState().equalsIgnoreCase("yellow")) {
+                        if (this.walker) {
+                            setWalkerStatus();
+                        }
+                        createMessageForNode("clone");
+                    } else {
+                        createMessageForNode("is agent present");
+                    }
+                } else if (this.currentNode.getState().equalsIgnoreCase("red")) {
+                    this.alive = false;
                 }
                 getMessages();
             }
