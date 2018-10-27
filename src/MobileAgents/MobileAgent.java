@@ -44,8 +44,6 @@ public class MobileAgent implements SensorObject, Runnable {
         this.currentNode = node;
     }
 
-
-    
     /**
      * Returning the id of the agent.
      * @return id, unique id of the agent
@@ -140,7 +138,7 @@ public class MobileAgent implements SensorObject, Runnable {
     
         while (this.alive) {
             present = System.currentTimeMillis();
-            if (Math.abs(time - present) >= 00) {
+            if (Math.abs(time - present) >= 500) {
                 time = present;
 
                 if (this.walker) {
