@@ -441,6 +441,7 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void analyzeMessage(Message message) {
         String messageString = message.getDetailedMessage();
+        System.out.println(message.toString());
         
         if (messageString.equalsIgnoreCase("is agent present")) {
             checkNodeForRandomWalk(message);
@@ -462,6 +463,13 @@ public class Node implements SensorObject, Runnable {
             makeNewState((Node) message.getReceiver());
         }
     }
+    
+    /**
+     * Printing out the name of this node.
+     * @return name of this node
+     */
+    @Override
+    public String printOutName() { return this.getName(); }
 
     /**
      * Performing a task on this specific thread.

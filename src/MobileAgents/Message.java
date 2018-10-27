@@ -65,7 +65,7 @@ public class Message {
      */
     @Override
     public String toString() {
-        return ("sender = " + sender.toString() + ", receiver = " +
-            receiver.toString() + " : " + detailedMessage + " " + clonedAgent);
+        return ("sender = " + sender.printOutName() + ", receiver = " +
+            receiver.printOutName() + " : " + detailedMessage + " " + clonedAgent);
     }
 }
