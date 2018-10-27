@@ -43,6 +43,8 @@ public class MobileAgent implements SensorObject, Runnable {
     public void setCurrentNode(Node node) {
         this.currentNode = node;
     }
+
+
     
     /**
      * Returning the id of the agent.

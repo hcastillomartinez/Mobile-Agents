@@ -390,7 +390,6 @@ public class Node implements SensorObject, Runnable {
      */
     private Node getLowestRankedNode(List<Node> list) {
         Node lowerRankNode = null;
-    
         //it was causing a deadlock issue when trying to send the nodes back
         // or retrieve them.
 //        Collections.sort(list,new BestOption());
@@ -400,8 +399,7 @@ public class Node implements SensorObject, Runnable {
 //                break;
 //            }
 //        }
-    
-    
+
         for (Node n: this.neighbors) {
             if (lowerRankNode == null) {
                 lowerRankNode = n;

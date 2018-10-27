@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.List;
 
 import MobileAgents.Node;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
@@ -35,7 +34,7 @@ public class Display {
         root.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5 + 20,
                          Screen.getPrimary().getBounds().getHeight() * 0.5 +
                              20);
-        pane.setPrefSize(circles*50,circles*50);
+        pane.setPrefSize(Screen.getPrimary().getBounds().getWidth()*.8,Screen.getPrimary().getBounds().getHeight()*.8);
         child.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5,
                           Screen.getPrimary().getBounds().getHeight() * 0.5);
         child.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
@@ -55,6 +54,7 @@ public class Display {
         }
         Timer t=new Timer();
         t.schedule(new TimerTask() {
+
             @Override
             public void run() {
                 update(circleList);
