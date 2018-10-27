@@ -121,7 +121,7 @@ public class GraphReader {
         
         if (!inKeys) {
             // look back here and check out the node for check time
-            this.graph.put(new Node(new LinkedBlockingQueue<>(1),
+            this.graph.put(new Node(new LinkedBlockingQueue<>(),
                                     newNodeX,
                                     newNodeY,
                                     "blue",
@@ -177,9 +177,9 @@ public class GraphReader {
      */
     private void setLevels(){
         while(levelDone()==false){
-         for(Node n: this.graph.keySet()){
-             setChildrenLevel(n);
-         }
+            for(Node n: this.graph.keySet()){
+                setChildrenLevel(n);
+            }
         }
     }
 
