@@ -22,4 +22,10 @@ public interface SensorObject {
      * Function used for analyzing the messages
      */
     void analyzeMessage(Message message);
+
+    /**
+     * Getting the name of the SensorNode.
+     * @return name of the node
+     */
+    String printOutName();
 }

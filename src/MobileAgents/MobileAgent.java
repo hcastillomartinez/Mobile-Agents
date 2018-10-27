@@ -121,15 +121,23 @@ public class MobileAgent implements SensorObject, Runnable {
     }
     
     /**
-     * Overriding toString() to print out the agent
-     * sync
+     * Overriding toString() to print out the agent.
      * @return string for the agent
      */
     public String toString() {
         return "" + this.getId() + " on " + this.currentNode.getName() + "";
     }
-
+    
     /**
+     * Getting the name of the MobileAgent.
+     * @return name of the mobile agent
+     */
+    @Override
+    public String printOutName() {
+        return this.toString();
+    }
+
+/**
      * Overriding run to perform specific tasks
      */
     @Override
