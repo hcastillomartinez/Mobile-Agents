@@ -85,6 +85,7 @@ public class MobileAgent implements SensorObject, Runnable {
     @Override
     public void analyzeMessage(Message message) {
         String messageDetail = message.getDetailedMessage();
+        System.out.println(message.toString());
 
         if (messageDetail.equalsIgnoreCase("agent present")) {
             createMessageForNode("is agent status");
@@ -138,7 +139,7 @@ public class MobileAgent implements SensorObject, Runnable {
     
         while (this.alive) {
             present = System.currentTimeMillis();
-            if (Math.abs(time - present) >= 1000) {
+            if (Math.abs(time - present) >= 00) {
                 time = present;
 
                 if (this.walker) {

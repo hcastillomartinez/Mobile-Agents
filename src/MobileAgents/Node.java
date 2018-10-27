@@ -61,15 +61,11 @@ public class Node implements SensorObject, Runnable {
          * make the fire spread after a certain amount of time.
          */
         @Override
-        public void run() {
+        public synchronized void run() {
             try {
                 Thread.sleep(5000);
                 this.node.setState("red");
                 if (this.node.agentPresent()) {
-                    this.node.agent.sendMessage(new Message(this.node,
-                                                            this.node.agent,
-                                                            null,
-                                                            "state changed"));
                     this.node.sendOrRemoveClone(this.node.agent,
                                                 node,
                                                 "remove clone");
@@ -82,6 +78,10 @@ public class Node implements SensorObject, Runnable {
                                                   n,
                                                   null,
                                                   "update to new state"));
+                        n.getAgent().sendMessage(new Message(n,
+                                                             n.getAgent(),
+                                                             null,
+                                                             "state changed"));
                     }
                 }
             } catch (InterruptedException ie) {
@@ -229,7 +229,7 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void analyzeMessage(Message message) {
         String messageString = message.getDetailedMessage();
-            System.out.println(message.toString());
+        System.out.println(message.toString());
         
         if (messageString.equalsIgnoreCase("is agent present")) {
             checkNodeForRandomWalk(message);
@@ -329,8 +329,14 @@ public class Node implements SensorObject, Runnable {
                                    SensorObject sender,
                                    String command) {
         if (this.isBaseStation()) {
-            if (!this.agentList.contains(mobileAgent)) {
-                this.agentList.add(mobileAgent);
+            if (command.equalsIgnoreCase("send clone home")) {
+                if (!this.agentList.contains(mobileAgent)) {
+                    this.agentList.add(mobileAgent);
+                }
+            } else if (command.equalsIgnoreCase("remove clone")){
+                if (this.agentList.contains(mobileAgent)) {
+                    this.agentList.remove(mobileAgent);
+                }
             }
         } else {
             Node node = getLowestRankedNode(this.neighbors);
@@ -378,7 +384,7 @@ public class Node implements SensorObject, Runnable {
      * @param list, of the neighbor nodes
      * @return lowest ranked neighbor
      */
-    private synchronized Node getLowestRankedNode(List<Node> list) {
+    private Node getLowestRankedNode(List<Node> list) {
         Node lowerRankNode = null;
     
         //it was causing a deadlock issue when trying to send the nodes back
@@ -407,7 +413,7 @@ public class Node implements SensorObject, Runnable {
      */
     private void updateState() {
         boolean fireFound = false;
-        for (Node n: neighbors) {
+        for (Node n: this.neighbors) {
             if (n.getState().equalsIgnoreCase("red") &&
                 !fireFound) {
                 fireFound = true;
