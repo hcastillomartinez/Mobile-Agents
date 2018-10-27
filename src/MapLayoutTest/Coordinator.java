@@ -13,15 +13,22 @@ import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * Starts Threads and Launches GUI
+ */
 public class Coordinator extends Application {
     ArrayList<Thread> threads = new ArrayList<>();
     String fileName = System.getProperty("user.dir") +
-            "/Resource/GraphTest";
+            "/Resource/VerticalHourGlass";
     GraphReader gr = new GraphReader(new File(fileName));
     HashMap<Node, ArrayList<Node>> map = gr.getGraph();
 
     Display display=new Display(map.keySet());
-    
+
+    /**
+     * Goes through Nodes in graph and sets the start of
+     * of simulation, starts all of the Threads here.
+     */
     public void beginSim(){
         for (Node n: map.keySet()) {
             if (n.isBaseStation()) {
@@ -47,11 +54,21 @@ public class Coordinator extends Application {
         }
     }
 
+    /**
+     * As program is launched Display sets everything
+     * and simulation is started.
+     * @param primaryStage
+     */
     @Override
     public void start(Stage primaryStage){
         display.createGUI(primaryStage);
         beginSim();
     }
+
+    /**
+     * When GUI is closed manually whole program
+     * is killed.
+     */
     @Override
     public void stop(){
         System.exit(0);

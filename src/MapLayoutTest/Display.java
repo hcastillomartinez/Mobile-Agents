@@ -18,8 +18,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 /**
- * draws the graph of a map.
- * Hector Castillo
+ * Draw a graph that is represented by set of Nodes
+ * it takes in.
  */
 public class Display {
     private AnchorPane root=new AnchorPane();
@@ -28,15 +28,25 @@ public class Display {
     private Set<Node> nodes;
     private Node bs=null;
 
+    /**
+     * Sets nodes to be Set passed in.
+     * @param n, Set of Nodes
+     */
     public Display(Set<Node> n){
         this.nodes=n;
     }
 
+    /**
+     * Sets the Nodes(JavaFx.Scene) on the stage passed in. Where
+     * update(TimerTask where update done) happens.
+     * @param primaryStage, Stage
+     */
     public void createGUI(Stage primaryStage){
         root.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5 + 20,
                          Screen.getPrimary().getBounds().getHeight() * 0.5 +
                              20);
-        pane.setPrefSize(Screen.getPrimary().getBounds().getWidth()*.8,Screen.getPrimary().getBounds().getHeight()*.8);
+        pane.setPrefSize(Screen.getPrimary().getBounds().getWidth()*.8,
+                Screen.getPrimary().getBounds().getHeight()*.8);
         child.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5,
                           Screen.getPrimary().getBounds().getHeight() * 0.5);
         child.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
@@ -69,9 +79,13 @@ public class Display {
         primaryStage.show();
     }
 
-
+    /**
+     * Goes through circle list and gets the node corresponding to
+     * circle and checks its state, based off of what state and agent
+     * status GUI Nodes are updated.
+     * @param circleList, List<Shapes>
+     */
     public void update(List<Shape> circleList){
-
         for(Shape circle: circleList) {
             if (circle.getId().equals("bs")) {
                 Node n=circleToNode(this.nodes,this.bs.retrieveName());
@@ -88,19 +102,25 @@ public class Display {
                 } else circle.setStroke(Color.GREEN);
             }
         }
-
     }
 
+    /**
+     * Gets the node from its corresponding GUI representation.
+     * @param keySet, Set<Node> that is nodes in the graph.
+     * @param name, Circle ID
+     * @return Returns a Node.
+     */
     private Node circleToNode(Set<Node> keySet,String name){
         for(Node node:keySet){
             if(node.retrieveName().equals(name))return node;
         }
         return null;
     }
+
     /**
      * Draws the circles on Pane, does not draw them in any particular
-     * order just what the keySet is for the map and that varies with how
-     * the nodes are ordered in the text file.
+     * order just what the from the keySet that is for the map and
+     *that varies with how the nodes are ordered in the text file.
      */
     private void addNodes(List<Shape> circleList){
         for(Iterator<Node> n=nodes.iterator();n.hasNext();){
@@ -136,8 +156,8 @@ public class Display {
 
     /**
      * Finds the Circle that represents a node in the graph.
-     * @param circleList, List that contains Circle representations on nodes.
-     * @param name, ID of node we are looking for.
+     * @param circleList, List<Circle> that contains Circle representations on nodes.
+     * @param name, Name of node that is also ID of circle.
      * @return Returns a Circle.
      */
     private Shape nodeToCircle(List<Shape> circleList, String name){
