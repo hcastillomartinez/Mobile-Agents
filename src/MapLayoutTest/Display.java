@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.List;
 
 import MobileAgents.Node;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
@@ -12,6 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 /**
@@ -30,13 +32,16 @@ public class Display {
 
     public void createGUI(Stage primaryStage){
         int circles=nodes.size();
-        root.setPrefSize(500,500);
+        root.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5 + 20,
+                         Screen.getPrimary().getBounds().getHeight() * 0.5 +
+                             20);
         pane.setPrefSize(circles*50,circles*50);
-        child.setPrefSize(500,350);
+        child.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5,
+                          Screen.getPrimary().getBounds().getHeight() * 0.5);
         child.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         child.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         child.setLayoutX(5);
-        child.setLayoutY(50);
+        child.setLayoutY(5);
         root.getChildren().add(child);
         child.setContent(pane);
         List<Circle> circleList=new ArrayList<>();
@@ -57,7 +62,7 @@ public class Display {
             }
         },1,1);
         Scene scene=new Scene(root);
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
         primaryStage.setScene(scene);
         primaryStage.show();
     }

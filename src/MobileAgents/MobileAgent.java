@@ -85,7 +85,6 @@ public class MobileAgent implements SensorObject, Runnable {
     @Override
     public void analyzeMessage(Message message) {
         String messageDetail = message.getDetailedMessage();
-        System.out.println(message.toString());
 
         if (messageDetail.equalsIgnoreCase("agent present")) {
             createMessageForNode("is agent status");
@@ -126,8 +125,8 @@ public class MobileAgent implements SensorObject, Runnable {
      * sync
      * @return string for the agent
      */
-    public String retrieveName() {
-        return "" + this.getId() + "";
+    public String toString() {
+        return "" + this.getId() + " on " + this.currentNode.getName() + "";
     }
 
     /**

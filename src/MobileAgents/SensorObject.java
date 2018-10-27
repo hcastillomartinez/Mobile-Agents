@@ -22,10 +22,4 @@ public interface SensorObject {
      * Function used for analyzing the messages
      */
     void analyzeMessage(Message message);
-    
-    /**
-     * Getting the string name representation of the SensorObject
-     * @return name of the object
-     */
-    String retrieveName();
 }

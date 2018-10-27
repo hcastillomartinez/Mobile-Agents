@@ -22,6 +22,7 @@ public class Node implements SensorObject, Runnable {
     private MobileAgent agent;
     private boolean baseStation;
     private int level;
+    private Object lock = new Object();
 
     /**
      * Constructor for the Node class.
@@ -51,6 +52,7 @@ public class Node implements SensorObject, Runnable {
     // class to send the final message
     private class FinalMessage extends Thread {
         private Node node;
+        private MobileAgent mobileAgent;
         
         private FinalMessage(Node node) {
             this.node = node;
@@ -61,16 +63,16 @@ public class Node implements SensorObject, Runnable {
          * make the fire spread after a certain amount of time.
          */
         @Override
-        public synchronized void run() {
+        public void run() {
             try {
-                Thread.sleep(5000);
-                this.node.setState("red");
+                Thread.sleep((new Random()).nextInt(5000) + 4000);
                 if (this.node.agentPresent()) {
-                    this.node.sendOrRemoveClone(this.node.agent,
+                    this.node.sendOrRemoveClone(this.node.getAgent(),
                                                 node,
                                                 "remove clone");
                 }
                 this.node.setAgent(null);
+                this.node.setState("red");
                 
                 for (Node n: this.node.getNeighbors()) {
                     if (!n.getState().equalsIgnoreCase("red")) {
@@ -231,7 +233,6 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void analyzeMessage(Message message) {
         String messageString = message.getDetailedMessage();
-        System.out.println(message.toString());
         
         if (messageString.equalsIgnoreCase("is agent present")) {
             checkNodeForRandomWalk(message);
@@ -330,7 +331,9 @@ public class Node implements SensorObject, Runnable {
     private void sendOrRemoveClone(MobileAgent mobileAgent,
                                    SensorObject sender,
                                    String command) {
-        if (this.isBaseStation()) {
+        if (this.isBaseStation() &&
+            !getState().equalsIgnoreCase("red")) {
+            System.out.println("list = " + this.agentList);
             if (command.equalsIgnoreCase("send clone home")) {
                 if (!this.agentList.contains(mobileAgent)) {
                     this.agentList.add(mobileAgent);
