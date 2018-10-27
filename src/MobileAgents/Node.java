@@ -228,7 +228,6 @@ public class Node implements SensorObject, Runnable {
     /**
      * Analyzing where to send the message.
      * @param message, message to analyze
-     *                 sync
      */
     @Override
     public void analyzeMessage(Message message) {
