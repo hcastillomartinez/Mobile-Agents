@@ -139,7 +139,7 @@ public class MobileAgent implements SensorObject, Runnable {
     
         while (this.alive) {
             present = System.currentTimeMillis();
-            if (Math.abs(time - present) >= 00) {
+            if (Math.abs(time - present) >= 500) {
                 time = present;
 
                 if (this.walker) {

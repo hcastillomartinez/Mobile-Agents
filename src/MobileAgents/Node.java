@@ -78,10 +78,12 @@ public class Node implements SensorObject, Runnable {
                                                   n,
                                                   null,
                                                   "update to new state"));
-                        n.getAgent().sendMessage(new Message(n,
-                                                             n.getAgent(),
-                                                             null,
-                                                             "state changed"));
+                        if (n.agentPresent()) {
+                            n.getAgent().sendMessage(new Message(n,
+                                                                 n.getAgent(),
+                                                                 null,
+                                                                 "state changed"));
+                        }
                     }
                 }
             } catch (InterruptedException ie) {
