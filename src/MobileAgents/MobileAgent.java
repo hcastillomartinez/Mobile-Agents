@@ -44,8 +44,6 @@ public class MobileAgent implements SensorObject, Runnable {
         this.currentNode = node;
     }
 
-
-    
     /**
      * Returning the id of the agent.
      * @return id, unique id of the agent
