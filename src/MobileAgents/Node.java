@@ -132,7 +132,7 @@ public class Node implements SensorObject, Runnable {
      * Returning the status of the node.
      * @return status, heat, of the node
      */
-    public String getState() { return this.state; }
+    public synchronized String getState() { return this.state; }
     
     /**
      * Returning the x value for the node.
@@ -156,7 +156,7 @@ public class Node implements SensorObject, Runnable {
      * Setting the state of the node.
      * @param stateSet, state of the node
      */
-    public void setState(String stateSet) {
+    public synchronized void setState(String stateSet) {
         this.state = stateSet;
     }
 
@@ -257,7 +257,7 @@ public class Node implements SensorObject, Runnable {
     /**
      * Creating the new state for the node
      */
-    private void makeNewState(Node node) {
+    private synchronized void makeNewState(Node node) {
         if (node.getState().equalsIgnoreCase("blue")) {
             setState("yellow");
         }
@@ -266,7 +266,7 @@ public class Node implements SensorObject, Runnable {
     /**
      * Checking the state of the node
      */
-    private void checkState(SensorObject sensorObject) {
+    private synchronized void checkState(SensorObject sensorObject) {
         if (state.equalsIgnoreCase("blue")) {
             sensorObject.sendMessage(new Message(this,
                                                  sensorObject,
@@ -332,7 +332,7 @@ public class Node implements SensorObject, Runnable {
                                    String command) {
         if (this.isBaseStation() &&
             !getState().equalsIgnoreCase("red")) {
-            System.out.println("list = " + this.agentList);
+//            System.out.println("list = " + this.agentList);
             if (command.equalsIgnoreCase("send clone home")) {
                 if (!this.agentList.contains(mobileAgent)) {
                     this.agentList.add(mobileAgent);
