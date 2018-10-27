@@ -12,6 +12,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -24,13 +26,13 @@ public class Display {
     private Pane pane=new Pane();
     private ScrollPane child =new ScrollPane();
     private Set<Node> nodes;
+    private Node bs=null;
 
     public Display(Set<Node> n){
         this.nodes=n;
     }
 
     public void createGUI(Stage primaryStage){
-        int circles=nodes.size();
         root.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5 + 20,
                          Screen.getPrimary().getBounds().getHeight() * 0.5 +
                              20);
@@ -43,7 +45,7 @@ public class Display {
         child.setLayoutY(5);
         root.getChildren().add(child);
         child.setContent(pane);
-        List<Circle> circleList=new ArrayList<>();
+        List<Shape> circleList=new ArrayList<>();
         List<Line> lineList=new ArrayList<>();
         addNodes(circleList);
         drawEdges(circleList,lineList);
@@ -68,16 +70,23 @@ public class Display {
     }
 
 
-    public void update(List<Circle> circleList){
-//        System.out.println("new update");
-        for(Circle circle: circleList){
-            Node n=circleToNode(this.nodes,circle.getId());
-            circle.setFill(Paint.valueOf(n.getState()));
-//            System.out.println(n.getState());
-            if(n.getAgent()==null){
-                circle.setStroke(Color.BLACK);
+    public void update(List<Shape> circleList){
+
+        for(Shape circle: circleList) {
+            if (circle.getId().equals("bs")) {
+                Node n=circleToNode(this.nodes,this.bs.retrieveName());
+                circle.setFill(Paint.valueOf(n.getState()));
+                if (n.getAgent() == null) {
+                    circle.setStroke(Color.BLACK);
+                } else circle.setStroke(Color.GREEN);
             }
-            else circle.setStroke(Color.GREEN);
+            else{
+                Node n = circleToNode(this.nodes, circle.getId());
+                circle.setFill(Paint.valueOf(n.getState()));
+                if (n.getAgent() == null) {
+                    circle.setStroke(Color.BLACK);
+                } else circle.setStroke(Color.GREEN);
+            }
         }
 
     }
@@ -93,16 +102,35 @@ public class Display {
      * order just what the keySet is for the map and that varies with how
      * the nodes are ordered in the text file.
      */
-    private void addNodes(List<Circle> circleList){
+    private void addNodes(List<Shape> circleList){
         for(Iterator<Node> n=nodes.iterator();n.hasNext();){
             Node node=n.next();
-            Circle circle = new Circle(15, Color.valueOf(node.getState()));
-            circle.setStrokeWidth(3.5);
-            circle.setStroke(Color.BLACK);
-            circle.setId(node.retrieveName());
-            circle.setCenterX(node.getX()*50+circle.getRadius()+20);
-            circle.setCenterY(node.getY()*50+circle.getRadius()+20);
-            circleList.add(circle);
+            if(node.isBaseStation()){
+                this.bs=node;
+                Rectangle rect=new Rectangle(30,30,Color.valueOf(node.getState()));
+                rect.setStrokeWidth(3.5);
+                rect.setStroke(Color.BLACK);
+                rect.setId("bs");
+                Circle circle = new Circle(15, Color.valueOf(node.getState()));
+                circle.setStrokeWidth(3.5);
+                circle.setStroke(Color.BLACK);
+                circle.setId(node.retrieveName());
+                circle.setCenterX(node.getX() * 50 + circle.getRadius() + 20);
+                circle.setCenterY(node.getY() * 50 + circle.getRadius() + 20);
+                rect.setX(node.getX()*50+circle.getRadius()+5);
+                rect.setY(node.getY()*50+circle.getRadius()+5);
+                circleList.add(circle);
+                circleList.add(rect);
+            }
+            else {
+                Circle circle = new Circle(15, Color.valueOf(node.getState()));
+                circle.setStrokeWidth(3.5);
+                circle.setStroke(Color.BLACK);
+                circle.setId(node.retrieveName());
+                circle.setCenterX(node.getX() * 50 + circle.getRadius() + 20);
+                circle.setCenterY(node.getY() * 50 + circle.getRadius() + 20);
+                circleList.add(circle);
+            }
         }
     }
 
@@ -112,8 +140,8 @@ public class Display {
      * @param name, ID of node we are looking for.
      * @return Returns a Circle.
      */
-    private Circle nodeToCircle(List<Circle> circleList, String name){
-        for(Circle circle:circleList){
+    private Shape nodeToCircle(List<Shape> circleList, String name){
+        for(Shape circle:circleList){
             if(circle.getId().equals(name))return circle;
         }
         return null;
@@ -123,15 +151,15 @@ public class Display {
      * Goes from node to node drawing a line between nodes that is
      * its neighbors.
      */
-    private void drawEdges(List<Circle> circleList, List<Line> lineList) {
+    private void drawEdges(List<Shape> circleList, List<Line> lineList) {
         Circle circle1;
         Circle circle2;
         for (Node node : this.nodes) { //keySet
-            circle1 = nodeToCircle(circleList, node.retrieveName());
+            circle1 = (Circle)nodeToCircle(circleList, node.retrieveName());
             List<Node> neighbors = node.getNeighbors();
             for (Node n : neighbors) {
                 Line line = new Line();
-                circle2 = nodeToCircle(circleList, n.retrieveName());
+                circle2 = (Circle)nodeToCircle(circleList, n.retrieveName());
                 line.startXProperty().bind(circle1.centerXProperty());
                 line.startYProperty().bind(circle1.centerYProperty());
                 line.endXProperty().bind(circle2.centerXProperty());
