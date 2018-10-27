@@ -17,6 +17,7 @@ public class Message {
      * message and the detailed message itself.
      * @param sender, node or agent from who the message is from
      * @param receiver, node or agent who receives the message
+     * @param clonedAgent, mobile agent to send
      * @param detailedMessage, message from the object
      */
     public Message(SensorObject sender,
