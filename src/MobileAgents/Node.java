@@ -125,12 +125,6 @@ public class Node implements SensorObject, Runnable {
      * @return neighbor list
      */
     public List<Node> getNeighbors() { return this.neighbors; }
-
-    /**
-     * Returning the status of the node.
-     * @return status, heat, of the node
-     */
-    public synchronized String getState() { return this.state; }
     
     /**
      * Returning the x value for the node.
@@ -149,6 +143,20 @@ public class Node implements SensorObject, Runnable {
      * @return baseStation status
      */
     public boolean isBaseStation() { return baseStation; }
+
+    /**
+     * Setting the node to the base station when graph is being read in.
+     */
+    public void setBaseStation() {
+        this.baseStation = true;
+        this.agentList = new CopyOnWriteArrayList<>();
+    }
+
+    /**
+     * Returning the status of the node.
+     * @return status, heat, of the node
+     */
+    public synchronized String getState() { return this.state; }
 
     /**
      * Setting the state of the node.
@@ -186,26 +194,7 @@ public class Node implements SensorObject, Runnable {
      * @return list of agents from the base station
      */
     public synchronized List<MobileAgent> mobileAgents() { return this.agentList; }
-
-    /**
-     * Setting the node to the base station when graph is being read in.
-     */
-    public void setBaseStation() {
-        this.baseStation = true;
-        this.agentList = new CopyOnWriteArrayList<>();
-    }
     
-    /**
-     * Returning the string of each agent in the list.
-     * @return agent list string
-     */
-    public String agentListString(){
-        String s="";
-        for(MobileAgent m:this.agentList){
-            s+=m.toString()+"\n";
-        }
-        return s;
-    }
     /**
      * Returning the status of whether the node has an agent present.
      * @return agentPresent, true if there is an agent and false otherwise
@@ -243,8 +232,9 @@ public class Node implements SensorObject, Runnable {
             mobileAgent.sendMessage(messageToSend);
         } else {
             this.setAgent(null);
-            node.setAgent(mobileAgent);
-            mobileAgent.setCurrentNode(node);
+            if (node.setAgent(mobileAgent)) {
+                mobileAgent.setCurrentNode(node);
+            }
 
             messageToSend = new Message(node,
                                         mobileAgent,
@@ -309,7 +299,6 @@ public class Node implements SensorObject, Runnable {
                                         message.getClonedAgent(),
                                         message.getDetailedMessage());
                 m.setLowerRankedNodes(message.getLowerRankedNodes());
-                System.out.println(m.getLowerRankedNodes().toString());
                 node.sendMessage(m);
             }
         }
@@ -453,7 +442,6 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void analyzeMessage(Message message) {
         String messageString = message.getDetailedMessage();
-        System.out.println(message.toString());
 
         if (messageString.equalsIgnoreCase("is agent present")) {
             checkNodeForRandomWalk(message);

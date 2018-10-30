@@ -1,4 +1,4 @@
-package MapLayoutTest;
+package MapLayout;
 
 import java.util.*;
 import java.util.List;
@@ -61,11 +61,12 @@ public class Display {
                 Screen.getPrimary().getBounds().getHeight()*.8);
         child.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5,
                           Screen.getPrimary().getBounds().getHeight() * 0.5);
-        agentList.setPrefSize(300,200);
+        
+        agentList.setPrefSize(350,200);
         agentList.setLayoutX(Screen.getPrimary().getBounds().getWidth() *
                                  0.5+50);
         agentList.setLayoutY(5);
-//        agentList.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        
         child.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         child.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         child.setLayoutX(5);
