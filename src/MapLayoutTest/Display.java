@@ -3,8 +3,14 @@ package MapLayoutTest;
 import java.util.*;
 import java.util.List;
 
+import MobileAgents.MobileAgent;
 import MobileAgents.Node;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -16,6 +22,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 /**
  * Draw a graph that is represented by set of Nodes
@@ -24,9 +31,14 @@ import javafx.stage.Stage;
 public class Display {
     private AnchorPane root=new AnchorPane();
     private Pane pane=new Pane();
+    private ListView<String> agentList=new ListView<>();
+//    private ScrollPane agentList=new ScrollPane();
     private ScrollPane child =new ScrollPane();
+    private Button start=new Button("Start");
     private Set<Node> nodes;
     private Node bs=null;
+    private int size=agentList.getItems().size();
+    private List<String> displayAgentList=new ArrayList<>();
 
     /**
      * Sets nodes to be Set passed in.
@@ -49,11 +61,15 @@ public class Display {
                 Screen.getPrimary().getBounds().getHeight()*.8);
         child.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5,
                           Screen.getPrimary().getBounds().getHeight() * 0.5);
+        agentList.setPrefSize(300,200);
+        agentList.setLayoutX(Screen.getPrimary().getBounds().getWidth() * 0.5+30);
+        agentList.setLayoutY(5);
+//        agentList.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         child.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         child.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         child.setLayoutX(5);
         child.setLayoutY(5);
-        root.getChildren().add(child);
+        root.getChildren().addAll(child,agentList);
         child.setContent(pane);
         List<Shape> circleList=new ArrayList<>();
         List<Line> lineList=new ArrayList<>();
@@ -61,18 +77,14 @@ public class Display {
         drawEdges(circleList,lineList);
         pane.getChildren().addAll(lineList);
         pane.getChildren().addAll(circleList);
-        for(Node n: this.nodes){
-            System.out.println(n.retrieveName()+ ": Level- "+n.getLevel());
-        }
         Timer t=new Timer();
         t.schedule(new TimerTask() {
-
             @Override
             public void run() {
                 update(circleList);
-
             }
         },1,1);
+        updateTable();
         Scene scene=new Scene(root);
         primaryStage.setResizable(true);
         primaryStage.setScene(scene);
@@ -104,6 +116,23 @@ public class Display {
         }
     }
 
+    /**
+     * Updates the table on the screen that shows the live agents
+     * if the base station is dead the ones on the table will never be updated again
+     * as the base station can no longer communicate.
+     */
+    public synchronized void updateTable() {
+        Timeline timeline=new Timeline(new KeyFrame(Duration.millis(1),e->{
+            if(this.bs.mobileAgents().size()!=0){
+                this.agentList.getItems().clear();
+                for(MobileAgent m:this.bs.mobileAgents()){
+                    this.agentList.getItems().add(m.toString());
+                }
+            }
+        }));
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+    }
     /**
      * Gets the node from its corresponding GUI representation.
      * @param keySet, Set<Node> that is nodes in the graph.

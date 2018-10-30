@@ -2,6 +2,7 @@ package MobileAgents;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -189,9 +190,15 @@ public class Node implements SensorObject, Runnable {
      */
     public void setBaseStation() {
         this.baseStation = true;
-        this.agentList = new ArrayList<>();
+        this.agentList = new CopyOnWriteArrayList<>();
     }
-
+    public String agentListString(){
+        String s="";
+        for(MobileAgent m:this.agentList){
+            s+=m.toString()+"\n";
+        }
+        return s;
+    }
     /**
      * Returning the status of whether the node has an agent present.
      * @return agentPresent, true if there is an agent and false otherwise
