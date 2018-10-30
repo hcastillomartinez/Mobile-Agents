@@ -12,17 +12,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Node implements SensorObject, Runnable {
     
     private String name;
-    private long time;
     private BlockingQueue<Message> queue;
     private String state;
     private int x, y;
     private List<Node> neighbors = new ArrayList<>();
-    private List<List<Node>> pathsBack;
     private List<MobileAgent> agentList;
     private MobileAgent agent;
     private boolean baseStation;
     private int level;
-    private Object lock = new Object();
 
     /**
      * Constructor for the Node class.
@@ -45,8 +42,6 @@ public class Node implements SensorObject, Runnable {
         this.baseStation = false;
         this.agent = null;
         this.level=0;
-        this.pathsBack = new ArrayList<>();
-        this.time = System.currentTimeMillis();
     }
 
     // class to send the final message
@@ -126,7 +121,7 @@ public class Node implements SensorObject, Runnable {
      * Gets the Level of the node.
      * @return Returns an int
      */
-    public int getLevel(){
+    public int getLevel() {
         return this.level;
     }
 
@@ -266,6 +261,7 @@ public class Node implements SensorObject, Runnable {
             if (n.getLevel() >= this.level) {
                 if (!n.getState().equalsIgnoreCase("red")) {
                     if (!message.getLowerRankedNodes().contains(n)) {
+                        System.out.println("in the higher ranked nodes");
                         message.getLowerRankedNodes().add(n);
                         return n;
                     }
@@ -297,7 +293,6 @@ public class Node implements SensorObject, Runnable {
                     this.agentList.remove(message.getClonedAgent());
                 }
             }
-            System.out.println("home queue = " + this.agentList);
         } else {
             Node node = getLowestRankedNode(message);
             if (node != null) {
@@ -306,6 +301,7 @@ public class Node implements SensorObject, Runnable {
                                         message.getClonedAgent(),
                                         message.getDetailedMessage());
                 m.setLowerRankedNodes(message.getLowerRankedNodes());
+                System.out.println(m.getLowerRankedNodes().toString());
                 node.sendMessage(m);
             }
         }
