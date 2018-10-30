@@ -48,7 +48,7 @@ public class MobileAgent implements SensorObject, Runnable {
      * Returning the id of the agent.
      * @return id, unique id of the agent
      */
-    private long getId() { return this.id; }
+    public long getId() { return this.id; }
     
     /**
      * Setting the walker to stop walking.
@@ -146,7 +146,7 @@ public class MobileAgent implements SensorObject, Runnable {
     
         while (this.alive) {
             present = System.currentTimeMillis();
-            if (Math.abs(time - present) >= 600) {
+//            if (Math.abs(time - present) >= 600) {
                 time = present;
 
                 if (this.walker) {
@@ -162,7 +162,7 @@ public class MobileAgent implements SensorObject, Runnable {
                     this.alive = false;
                 }
                 getMessages();
-            }
+//            }
         }
     }
 }

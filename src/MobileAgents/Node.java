@@ -42,7 +42,7 @@ public class Node implements SensorObject, Runnable {
         this.name = name;
         this.baseStation = false;
         this.agent = null;
-        this.level=0;
+        this.level = 0;
     }
 
     // class to send the final message
@@ -172,7 +172,7 @@ public class Node implements SensorObject, Runnable {
         this.agent = mobileAgent;
     }
     
-    
+
     /**
      * Returning the mobile agent on the node.
      * @return mobile agent on the node
@@ -299,7 +299,6 @@ public class Node implements SensorObject, Runnable {
                     this.agentList.remove(message.getClonedAgent());
                 }
             }
-            System.out.println(this.agentList + " = agentList");
         } else {
             Node node = getLowestRankedNode(message);
             if (node != null) {
@@ -319,7 +318,7 @@ public class Node implements SensorObject, Runnable {
      * @param node, node to clone an agent on
      */
     private void clone(Node node) {
-        long id = (new Random()).nextLong();
+        long id = (new Random()).nextLong() + this.agent.getId();
         MobileAgent mobileAgent = new MobileAgent(new LinkedBlockingQueue<>(1),
                                                   Math.abs(id),
                                                   node,
