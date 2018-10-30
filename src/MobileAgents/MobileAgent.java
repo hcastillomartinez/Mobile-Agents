@@ -44,6 +44,13 @@ public class MobileAgent implements SensorObject, Runnable {
         this.currentNode = node;
     }
 
+    public boolean state(){
+        if(!this.currentNode.getState().equals("red")){
+            return true;
+        }
+        else return false;
+    }
+
     /**
      * Returning the id of the agent.
      * @return id, unique id of the agent
@@ -125,7 +132,8 @@ public class MobileAgent implements SensorObject, Runnable {
      * @return string for the agent
      */
     public String toString() {
-        return "" + this.getId() + " on " + this.currentNode.getName() + "";
+        if(state()) return "" + this.getId() + " on " + this.currentNode.getName() + " State: Alive";
+        else return "" + this.getId() + " on " + this.currentNode.getName() + " State: Dead";
     }
     
     /**
