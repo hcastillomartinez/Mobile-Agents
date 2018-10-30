@@ -21,6 +21,7 @@ public class Node implements SensorObject, Runnable {
     private MobileAgent agent;
     private boolean baseStation;
     private int level;
+    private Object lock = new Object();
 
     /**
      * Constructor for the Node class.
@@ -161,8 +162,17 @@ public class Node implements SensorObject, Runnable {
      * Returning the agent on the node.
      * @param mobileAgent, mobile agent from this node
      */
-    public synchronized void setAgent(MobileAgent mobileAgent) {
-        this.agent = mobileAgent;
+    public synchronized boolean setAgent(MobileAgent mobileAgent) {
+        if (this.agent == null) {
+            this.agent = mobileAgent;
+            return true;
+        } else {
+            if (mobileAgent == null) {
+                this.agent = mobileAgent;
+                return true;
+            }
+            return false;
+        }
     }
 
     /**
@@ -184,6 +194,11 @@ public class Node implements SensorObject, Runnable {
         this.baseStation = true;
         this.agentList = new CopyOnWriteArrayList<>();
     }
+    
+    /**
+     * Returning the string of each agent in the list.
+     * @return agent list string
+     */
     public String agentListString(){
         String s="";
         for(MobileAgent m:this.agentList){
@@ -195,7 +210,7 @@ public class Node implements SensorObject, Runnable {
      * Returning the status of whether the node has an agent present.
      * @return agentPresent, true if there is an agent and false otherwise
      */
-    public boolean agentPresent() {
+    public synchronized boolean agentPresent() {
         if (this.agent == null) {
             return false;
         }
@@ -259,7 +274,6 @@ public class Node implements SensorObject, Runnable {
             if (n.getLevel() >= this.level) {
                 if (!n.getState().equalsIgnoreCase("red")) {
                     if (!message.getLowerRankedNodes().contains(n)) {
-                        System.out.println("in the higher ranked nodes");
                         message.getLowerRankedNodes().add(n);
                         return n;
                     }
@@ -313,11 +327,12 @@ public class Node implements SensorObject, Runnable {
                                                   false,
                                                   true);
         (new Thread(mobileAgent)).start();
-        node.setAgent(mobileAgent);
-        node.sendMessage(new Message(node,
-                                     node,
-                                     mobileAgent,
-                                     "send clone home"));
+        if (node.setAgent(mobileAgent)) {
+            node.sendMessage(new Message(node,
+                                         node,
+                                         mobileAgent,
+                                         "send clone home"));
+        }
     }
     
     /**

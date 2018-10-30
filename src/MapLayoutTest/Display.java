@@ -62,7 +62,8 @@ public class Display {
         child.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5,
                           Screen.getPrimary().getBounds().getHeight() * 0.5);
         agentList.setPrefSize(300,200);
-        agentList.setLayoutX(Screen.getPrimary().getBounds().getWidth() * 0.5+30);
+        agentList.setLayoutX(Screen.getPrimary().getBounds().getWidth() *
+                                 0.5+50);
         agentList.setLayoutY(5);
 //        agentList.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         child.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);

@@ -154,7 +154,7 @@ public class MobileAgent implements SensorObject, Runnable {
     
         while (this.alive) {
             present = System.currentTimeMillis();
-//            if (Math.abs(time - present) >= 600) {
+            if (Math.abs(time - present) >= 600) {
                 time = present;
 
                 if (this.walker) {
@@ -170,7 +170,7 @@ public class MobileAgent implements SensorObject, Runnable {
                     this.alive = false;
                 }
                 getMessages();
-//            }
+            }
         }
     }
 }
