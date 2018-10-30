@@ -1,5 +1,7 @@
 package MobileAgents;
 
+import java.util.LinkedList;
+
 /**
  * Message.java is the structure for the message to be sent among the
  * SensorObjects.
@@ -11,6 +13,7 @@ public class Message {
     private SensorObject receiver;
     private MobileAgent clonedAgent;
     private String detailedMessage;
+    private LinkedList<Node> lowerRankedNodes;
     
     /**
      * Constructor for the Message class that holds the originator of the
@@ -28,6 +31,23 @@ public class Message {
         this.receiver = receiver;
         this.clonedAgent = clonedAgent;
         this.detailedMessage = detailedMessage;
+        this.lowerRankedNodes = new LinkedList<>();
+    }
+    
+    /**
+     * Returning the list of the lower ranked nodes.
+     * @return list of the lower ranked nodes
+     */
+    public LinkedList<Node> getLowerRankedNodes() {
+        return this.lowerRankedNodes;
+    }
+    
+    /**
+     * Setting this list of lower nodes to the specified list.
+     * @param list of nodes to set as
+     */
+    public void setLowerRankedNodes(LinkedList<Node> list) {
+        this.lowerRankedNodes = list;
     }
     
     /**

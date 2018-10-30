@@ -19,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Coordinator extends Application {
     ArrayList<Thread> threads = new ArrayList<>();
     String fileName = System.getProperty("user.dir") +
-            "/Resource/VerticalHourGlass";
+            "/Resource/BottleNeck";
     GraphReader gr = new GraphReader(new File(fileName));
     HashMap<Node, ArrayList<Node>> map = gr.getGraph();
 
