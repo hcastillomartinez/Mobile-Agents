@@ -171,6 +171,7 @@ public class Node implements SensorObject, Runnable {
         this.agent = mobileAgent;
     }
     
+    
     /**
      * Returning the mobile agent on the node.
      * @return mobile agent on the node
