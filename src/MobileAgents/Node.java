@@ -61,13 +61,6 @@ public class Node implements SensorObject, Runnable {
         public void run() {
             try {
                 Thread.sleep((new Random()).nextInt(5000) + 10000);
-                if (this.node.agentPresent()) {
-                    this.node.sendOrRemoveClone(new Message(this.node,
-                                                            this.node,
-                                                            this.node
-                                                                .getAgent(),
-                                                            "remove clone"));
-                }
                 this.node.setAgent(null);
                 this.node.setState("red");
                 
@@ -171,7 +164,6 @@ public class Node implements SensorObject, Runnable {
     public synchronized void setAgent(MobileAgent mobileAgent) {
         this.agent = mobileAgent;
     }
-    
 
     /**
      * Returning the mobile agent on the node.
@@ -293,10 +285,6 @@ public class Node implements SensorObject, Runnable {
             if (message.getDetailedMessage().equalsIgnoreCase("send clone home")) {
                 if (!this.agentList.contains(message.getClonedAgent())) {
                     this.agentList.add(message.getClonedAgent());
-                }
-            } else if (message.getDetailedMessage().equalsIgnoreCase("remove clone")){
-                if (this.agentList.contains(message.getClonedAgent())) {
-                    this.agentList.remove(message.getClonedAgent());
                 }
             }
         } else {
