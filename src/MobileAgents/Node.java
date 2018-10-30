@@ -167,7 +167,7 @@ public class Node implements SensorObject, Runnable {
      * Returning the agent on the node.
      * @param mobileAgent, mobile agent from this node
      */
-    public void setAgent(MobileAgent mobileAgent) {
+    public synchronized void setAgent(MobileAgent mobileAgent) {
         this.agent = mobileAgent;
     }
     
@@ -175,13 +175,13 @@ public class Node implements SensorObject, Runnable {
      * Returning the mobile agent on the node.
      * @return mobile agent on the node
      */
-    public MobileAgent getAgent() { return this.agent; }
+    public synchronized MobileAgent getAgent() { return this.agent; }
     
     /**
      * Returning the list of the agents from the base station.
      * @return list of agents from the base station
      */
-    public List<MobileAgent> mobileAgents() { return this.agentList; }
+    public synchronized List<MobileAgent> mobileAgents() { return this.agentList; }
 
     /**
      * Setting the node to the base station when graph is being read in.
@@ -213,7 +213,7 @@ public class Node implements SensorObject, Runnable {
      * Analyzing the message from the queue.
      * @param message, message to check
      */
-    private void checkNodeForRandomWalk(Message message) {
+    private synchronized void checkNodeForRandomWalk(Message message) {
         Message messageToSend;
         Random random = new Random();
         MobileAgent mobileAgent = (MobileAgent) message.getSender();
@@ -237,8 +237,6 @@ public class Node implements SensorObject, Runnable {
                                         "moved");
             mobileAgent.sendMessage(messageToSend);
         }
-
-
     }
     
     /**
@@ -281,7 +279,7 @@ public class Node implements SensorObject, Runnable {
     /**
      * Sending the cloned mobile agent information home to the base station.
      */
-    private void sendOrRemoveClone(Message message) {
+    private synchronized void sendOrRemoveClone(Message message) {
         if (this.isBaseStation() &&
             !getState().equalsIgnoreCase("red")) {
             if (message.getDetailedMessage().equalsIgnoreCase("send clone home")) {
@@ -293,6 +291,7 @@ public class Node implements SensorObject, Runnable {
                     this.agentList.remove(message.getClonedAgent());
                 }
             }
+            System.out.println(this.agentList + " = agentList");
         } else {
             Node node = getLowestRankedNode(message);
             if (node != null) {
