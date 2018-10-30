@@ -252,25 +252,6 @@ public class Node implements SensorObject, Runnable {
      * @return lowest ranked neighbor
      */
     private Node getLowestRankedNode(Message message) {
-        //it was causing a deadlock issue when trying to send the nodes back
-        // or retrieve them.
-//        Collections.sort(list,new BestOption());
-//        for(Node n: list){
-//            if(n.getState().equals("blue") || n.getState().equals("yellow")){
-//                lowerRankNode=n;
-//                break;
-//            }
-//        }
-        Node lowerRankNode = null;
-        
-//        for (Node n: this.neighbors) {
-//            if (lowerRankNode == null) {
-//                lowerRankNode = n;
-//            } else if (lowerRankNode.getLevel() > n.getLevel()) {
-//                lowerRankNode = n;
-//            }
-//        }
-
         for (Node n: this.neighbors) {
             if (n.getLevel() < this.level) {
                 if (!n.getState().equalsIgnoreCase("red")) {
@@ -291,7 +272,7 @@ public class Node implements SensorObject, Runnable {
                 }
             }
         }
-        return lowerRankNode;
+        return null;
     }
     
     
