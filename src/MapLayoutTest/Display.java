@@ -32,14 +32,11 @@ public class Display {
     private AnchorPane root=new AnchorPane();
     private Pane pane=new Pane();
     private ListView<String> agentList=new ListView<>();
-//    private ScrollPane agentList=new ScrollPane();
     private ScrollPane child =new ScrollPane();
-    private Button start=new Button("Start");
     private Set<Node> nodes;
     private Node bs=null;
-    private int size=agentList.getItems().size();
-    private List<String> displayAgentList=new ArrayList<>();
-
+    private boolean flag=false;
+    private Timeline timeline;
     /**
      * Sets nodes to be Set passed in.
      * @param n, Set of Nodes
@@ -53,7 +50,7 @@ public class Display {
      * update(TimerTask where update done) happens.
      * @param primaryStage, Stage
      */
-    public void createGUI(Stage primaryStage){
+    public void createGUI(Stage primaryStage,Button button){
         root.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5 + 20,
                          Screen.getPrimary().getBounds().getHeight() * 0.5 +
                              20);
@@ -64,12 +61,13 @@ public class Display {
         agentList.setPrefSize(300,200);
         agentList.setLayoutX(Screen.getPrimary().getBounds().getWidth() * 0.5+30);
         agentList.setLayoutY(5);
-//        agentList.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        button.setLayoutY(Screen.getPrimary().getBounds().getHeight() * 0.5+10);
+        button.setLayoutX((Screen.getPrimary().getBounds().getWidth() * 0.5 + 20)/2);
         child.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         child.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         child.setLayoutX(5);
         child.setLayoutY(5);
-        root.getChildren().addAll(child,agentList);
+        root.getChildren().addAll(child,agentList,button);
         child.setContent(pane);
         List<Shape> circleList=new ArrayList<>();
         List<Line> lineList=new ArrayList<>();
@@ -84,7 +82,7 @@ public class Display {
                 update(circleList);
             }
         },1,1);
-        updateTable();
+        updateTable(timeline);
         Scene scene=new Scene(root);
         primaryStage.setResizable(true);
         primaryStage.setScene(scene);
@@ -97,7 +95,7 @@ public class Display {
      * status GUI Nodes are updated.
      * @param circleList, List<Shapes>
      */
-    public void update(List<Shape> circleList){
+    private void update(List<Shape> circleList){
         for(Shape circle: circleList) {
             if (circle.getId().equals("bs")) {
                 Node n=circleToNode(this.nodes,this.bs.retrieveName());
@@ -119,11 +117,17 @@ public class Display {
     /**
      * Updates the table on the screen that shows the live agents
      * if the base station is dead the ones on the table will never be updated again
-     * as the base station can no longer communicate.
+     * as the base station can no longer communicate. Also new agents that are created
+     * that cannot be reached will also not show up on table as they shouldn't be able
+     * to.
      */
-    public synchronized void updateTable() {
-        Timeline timeline=new Timeline(new KeyFrame(Duration.millis(1),e->{
-            if(this.bs.mobileAgents().size()!=0){
+    private synchronized void updateTable(Timeline timeline) {
+        timeline=new Timeline(new KeyFrame(Duration.millis(1),e->{
+            if(this.flag==false && this.bs.getState().equals("red")){
+                this.agentList.getItems().add("Base Station is on fire.");
+                this.flag=true;
+            }
+            else if(this.bs.mobileAgents().size()!=0 && flag==false){
                 this.agentList.getItems().clear();
                 for(MobileAgent m:this.bs.mobileAgents()){
                     this.agentList.getItems().add(m.toString());
@@ -133,6 +137,7 @@ public class Display {
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
     }
+
     /**
      * Gets the node from its corresponding GUI representation.
      * @param keySet, Set<Node> that is nodes in the graph.

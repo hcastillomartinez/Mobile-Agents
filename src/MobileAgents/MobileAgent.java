@@ -44,7 +44,12 @@ public class MobileAgent implements SensorObject, Runnable {
         this.currentNode = node;
     }
 
-    public boolean state(){
+    /**
+     * Checks the state of the node that it sits on
+     * if red then returns true meaning it's dead.
+     * @return
+     */
+    private boolean state(){
         if(!this.currentNode.getState().equals("red")){
             return true;
         }
