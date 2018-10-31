@@ -1,4 +1,4 @@
-package MapLayoutTest;
+package MapLayout;
 
 import java.util.*;
 import java.util.List;
