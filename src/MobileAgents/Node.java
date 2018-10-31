@@ -259,7 +259,7 @@ public class Node implements SensorObject, Runnable {
             if (n.getLevel() >= this.level) {
                 if (!n.getState().equalsIgnoreCase("red")) {
                     if (!message.getLowerRankedNodes().contains(n)) {
-//                        System.out.println("in the higher ranked nodes");
+                        System.out.println("in the higher ranked nodes");
                         message.getLowerRankedNodes().add(n);
                         return n;
                     }
@@ -295,7 +295,7 @@ public class Node implements SensorObject, Runnable {
                                         message.getClonedAgent(),
                                         message.getDetailedMessage());
                 m.setLowerRankedNodes(message.getLowerRankedNodes());
-//                System.out.println(m.getLowerRankedNodes().toString());
+                System.out.println(m.getLowerRankedNodes().toString());
                 node.sendMessage(m);
             }
         }
@@ -438,7 +438,7 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void analyzeMessage(Message message) {
         String messageString = message.getDetailedMessage();
-//        System.out.println(message.toString());
+        System.out.println(message.toString());
 
         if (messageString.equalsIgnoreCase("is agent present")) {
             checkNodeForRandomWalk(message);
