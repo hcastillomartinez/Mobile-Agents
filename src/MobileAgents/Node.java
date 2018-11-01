@@ -15,7 +15,7 @@ public class Node implements SensorObject, Runnable {
     private String name;
     private BlockingQueue<Message> queue;
     private String state;
-    private int x, y;
+    private int x, y, nodeID;
     private List<Node> neighbors = new ArrayList<>();
     private List<MobileAgent> agentList;
     private MobileAgent agent;
@@ -86,10 +86,15 @@ public class Node implements SensorObject, Runnable {
     
     
     /******************************************************************/
-        /*                                                                */
-        /*                    Getting Class Data Functions                */
-        /*                                                                */
+    /*                                                                */
+    /*                    Getting Class Data Functions                */
+    /*                                                                */
     /******************************************************************/
+    
+    /**
+     * Setting the node ID.
+     */
+    public void setNodeIDForAgent(int id) { this.nodeID = id; }
     
     /**
      * Returning the name of the node.
@@ -175,7 +180,7 @@ public class Node implements SensorObject, Runnable {
             return true;
         } else {
             if (mobileAgent == null) {
-                this.agent = mobileAgent;
+                this.agent = null;
                 return true;
             }
             return false;
@@ -193,6 +198,12 @@ public class Node implements SensorObject, Runnable {
      * @return list of agents from the base station
      */
     public synchronized List<MobileAgent> mobileAgents() { return this.agentList; }
+    
+    /**
+     * Returning the nodeID for creating mobile agent uniqueness.
+     * @return nodeID, long node id
+     */
+    public long getNodeID() { return (long) this.nodeID;}
     
     /**
      * Returning the status of whether the node has an agent present.
@@ -310,7 +321,7 @@ public class Node implements SensorObject, Runnable {
         long randTwo = (new Random()).nextLong() + this.agent.getId();
         id = (long)0.5*(randOne + randTwo)*(randOne + randTwo + 1)+randTwo;
         MobileAgent mobileAgent = new MobileAgent(new LinkedBlockingQueue<>(1),
-                                                  Math.abs(id),
+                                                  node.getNodeID(),
                                                   node,
                                                   false,
                                                   true);
@@ -347,9 +358,9 @@ public class Node implements SensorObject, Runnable {
     
     
     /******************************************************************/
-        /*                                                                */
-        /*                        Updating State Functions                */
-        /*                                                                */
+    /*                                                                */
+    /*                        Updating State Functions                */
+    /*                                                                */
     /******************************************************************/
     
     /**
@@ -403,9 +414,9 @@ public class Node implements SensorObject, Runnable {
     
     
     /******************************************************************/
-        /*                                                                */
-        /*                       Override Functions                      */
-        /*                                                                */
+    /*                                                                */
+    /*                       Override Functions                      */
+    /*                                                                */
     /******************************************************************/
     
     /**

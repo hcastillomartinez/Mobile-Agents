@@ -20,7 +20,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Coordinator extends Application {
     private ArrayList<Thread> threads = new ArrayList<>();
     private String fileName = System.getProperty("user.dir") +
-            "/Resource/GraphTestTwo";
+            "/Resource/BowlSkew";
     private GraphReader gr = new GraphReader(new File(fileName));
     private HashMap<Node, ArrayList<Node>> map = gr.getGraph();
     private Button start=new Button("Start");
@@ -37,7 +37,7 @@ public class Coordinator extends Application {
                 BlockingQueue<Message> queue = new LinkedBlockingQueue<>(1);
                 long id = (new Random()).nextLong();
                 MobileAgent mobileAgent = new MobileAgent(queue,
-                                                          Math.abs(id),
+                                                          n.getNodeID(),
                                                           n,
                                                           true,
                                                           true);

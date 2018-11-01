@@ -29,6 +29,7 @@ public class GraphReader {
         this.graph = new HashMap<>();
         readInGraph();
         setLevels();
+        setNodeID();
     }
     
     /**
@@ -81,6 +82,17 @@ public class GraphReader {
             scanner.close();
         } catch (FileNotFoundException fe) {
             fe.printStackTrace();
+        }
+    }
+    
+    /**
+     * Setting the node ID's to be unique.
+     */
+    private void setNodeID() {
+        int i = 1;
+        for (Node n: this.graph.keySet()) {
+            n.setNodeIDForAgent(i);
+            i++;
         }
     }
 
