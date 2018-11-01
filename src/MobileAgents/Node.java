@@ -305,7 +305,10 @@ public class Node implements SensorObject, Runnable {
      * @param node, node to clone an agent on
      */
     private void clone(Node node) {
-        long id = (new Random()).nextLong() + this.agent.getId();
+        long id;
+        long randOne = (new Random()).nextLong() + this.agent.getId();
+        long randTwo = (new Random()).nextLong() + this.agent.getId();
+        id = (long)0.5*(randOne + randTwo)*(randOne + randTwo + 1)+randTwo;
         MobileAgent mobileAgent = new MobileAgent(new LinkedBlockingQueue<>(1),
                                                   Math.abs(id),
                                                   node,
