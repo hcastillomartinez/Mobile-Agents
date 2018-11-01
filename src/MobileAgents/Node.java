@@ -198,7 +198,7 @@ public class Node implements SensorObject, Runnable {
      * Returning the status of whether the node has an agent present.
      * @return agentPresent, true if there is an agent and false otherwise
      */
-    public synchronized boolean agentPresent() {
+    private synchronized boolean agentPresent() {
         if (this.agent == null) {
             return false;
         }
@@ -207,9 +207,9 @@ public class Node implements SensorObject, Runnable {
     
     
     /******************************************************************/
-        /*                                                                */
-        /*                 Mobile Agent Interaction Functions             */
-        /*                                                                */
+    /*                                                                */
+    /*                 Mobile Agent Interaction Functions             */
+    /*                                                                */
     /******************************************************************/
     
     /**
@@ -223,22 +223,19 @@ public class Node implements SensorObject, Runnable {
         int nodePosition = random.nextInt(this.getNeighbors().size());
         Node node = this.getNeighbors().get(nodePosition);
         
-        if (node.agentPresent()) {
-            messageToSend = new Message(node,
-                                        mobileAgent,
-                                        null,
-                                        "agent present");
-            mobileAgent.sendMessage(messageToSend);
-        } else {
-            this.setAgent(null);
-            if (node.setAgent(mobileAgent)) {
-                mobileAgent.setCurrentNode(node);
-            }
-            
+        if (node.setAgent(mobileAgent)) {
+            this.agent = null;
+            mobileAgent.setCurrentNode(node);
             messageToSend = new Message(node,
                                         mobileAgent,
                                         null,
                                         "moved");
+            mobileAgent.sendMessage(messageToSend);
+        } else {
+            messageToSend = new Message(node,
+                                        mobileAgent,
+                                        null,
+                                        "agent present");
             mobileAgent.sendMessage(messageToSend);
         }
     }
@@ -274,9 +271,9 @@ public class Node implements SensorObject, Runnable {
     
     
     /******************************************************************/
-        /*                                                                */
-        /*                        Cloning Functions                       */
-        /*                                                                */
+    /*                                                                */
+    /*                        Cloning Functions                       */
+    /*                                                                */
     /******************************************************************/
     
     /**
@@ -308,7 +305,10 @@ public class Node implements SensorObject, Runnable {
      * @param node, node to clone an agent on
      */
     private void clone(Node node) {
-        long id = (new Random()).nextLong() + this.agent.getId();
+        long id;
+        long randOne = (new Random()).nextLong() + this.agent.getId();
+        long randTwo = (new Random()).nextLong() + this.agent.getId();
+        id = (long)0.5*(randOne + randTwo)*(randOne + randTwo + 1)+randTwo;
         MobileAgent mobileAgent = new MobileAgent(new LinkedBlockingQueue<>(1),
                                                   Math.abs(id),
                                                   node,
@@ -478,7 +478,7 @@ public class Node implements SensorObject, Runnable {
     }
 }
 
-
+// spanning tree
 
 
 

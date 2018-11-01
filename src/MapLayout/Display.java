@@ -58,7 +58,7 @@ public class Display {
                 Screen.getPrimary().getBounds().getHeight()*.8);
         child.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5,
                           Screen.getPrimary().getBounds().getHeight() * 0.5);
-        agentList.setPrefSize(300,200);
+        agentList.setPrefSize(300,400);
         agentList.setLayoutX(Screen.getPrimary().getBounds().getWidth() * 0.5+30);
         agentList.setLayoutY(5);
         button.setLayoutY(Screen.getPrimary().getBounds().getHeight() * 0.5+10);
@@ -84,7 +84,7 @@ public class Display {
         },1,1);
         updateTable(timeline);
         Scene scene=new Scene(root);
-        primaryStage.setResizable(true);
+        primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -103,8 +103,7 @@ public class Display {
                 if (n.getAgent() == null) {
                     circle.setStroke(Color.BLACK);
                 } else circle.setStroke(Color.GREEN);
-            }
-            else{
+            } else{
                 Node n = circleToNode(this.nodes, circle.getId());
                 circle.setFill(Paint.valueOf(n.getState()));
                 if (n.getAgent() == null) {
