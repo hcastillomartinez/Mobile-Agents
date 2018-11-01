@@ -1,5 +1,5 @@
-fire 3 3
-station 0 3
+fire 0 3
+station 3 3
 node 0 3
 node 3 3
 node 2 2
