@@ -29,7 +29,7 @@ public class GraphReader {
         this.graph = new HashMap<>();
         readInGraph();
         setLevels();
-//        printGraph();
+        setNodeID();
     }
     
     /**
@@ -82,6 +82,17 @@ public class GraphReader {
             scanner.close();
         } catch (FileNotFoundException fe) {
             fe.printStackTrace();
+        }
+    }
+    
+    /**
+     * Setting the node ID's to be unique.
+     */
+    private void setNodeID() {
+        int i = 1;
+        for (Node n: this.graph.keySet()) {
+            n.setNodeIDForAgent(i);
+            i++;
         }
     }
 
@@ -165,16 +176,6 @@ public class GraphReader {
     private String makeNodeName(int xSpot, int ySpot) {
         return "" + xSpot + " " + ySpot + "";
     }
-
-//    public void printGraph(){
-//        for(Node n:graph.keySet()){
-//            System.out.print("root: "+n.getName()+"");
-//            for(Node a:n.getNeighbors()){
-//                System.out.print(" "+a.getName());
-//            }
-//            System.out.println();
-//        }
-//    }
     
     /**
      * Returning the built graph.
