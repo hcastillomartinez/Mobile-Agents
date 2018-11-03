@@ -3,8 +3,10 @@ package MapLayout;
 import MobileAgents.Message;
 import MobileAgents.MobileAgent;
 import MobileAgents.Node;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.control.Button;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -17,14 +19,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Starts Threads and Launches GUI
  */
+
 public class Coordinator extends Application {
+    private FileChooser fileChooser=new FileChooser();
     private ArrayList<Thread> threads = new ArrayList<>();
-    private String fileName = System.getProperty("user.dir") +
-            "/Resource/BowlSkew";
-    private GraphReader gr = new GraphReader(new File(fileName));
-    private HashMap<Node, ArrayList<Node>> map = gr.getGraph();
+    private File file=null;
+    private GraphReader gr;
+    private HashMap<Node, ArrayList<Node>> map;
     private Button start=new Button("Start");
-    private Display display=new Display(map.keySet());
+    private Display display;
     private boolean started=false;
 
     /**
@@ -37,7 +40,7 @@ public class Coordinator extends Application {
                 BlockingQueue<Message> queue = new LinkedBlockingQueue<>(1);
                 long id = (new Random()).nextLong();
                 MobileAgent mobileAgent = new MobileAgent(queue,
-                                                          n.getNodeID(),
+                                                          Math.abs(id),
                                                           n,
                                                           true,
                                                           true);
@@ -63,15 +66,24 @@ public class Coordinator extends Application {
      */
     @Override
     public void start(Stage primaryStage){
-        start.setOnMousePressed(e->{
-            if(started==false){
-                beginSim();
-                started=true;
-            }
-
-        });
-        display.createGUI(primaryStage,start);
-//        beginSim();
+        file=fileChooser.showOpenDialog(null);
+        if(file==null){
+            System.out.println("Nothing Chosen");
+            System.exit(0);
+        }
+        else {
+            gr = new GraphReader(file);
+            map = gr.getGraph();
+            display = new Display(map.keySet());
+            display.createGUI(primaryStage,start);
+            display.start();
+            start.setOnMousePressed(e -> {
+                if (started == false) {
+                    beginSim();
+                    started = true;
+                }
+            });
+        }
     }
 
     /**

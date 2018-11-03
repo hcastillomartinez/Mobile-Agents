@@ -8,8 +8,10 @@ import MobileAgents.Node;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
@@ -20,6 +22,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -32,6 +35,9 @@ public class Display {
     private AnchorPane root=new AnchorPane();
     private Pane pane=new Pane();
     private ListView<String> agentList=new ListView<>();
+    private String files[]={"BaseStationCenter","BottleNeck","BowlSkew","GraphTest","GraphTestTwo",
+            "Star","VerticalHourGlass","VerticalHourGlassTwo"};
+//    private ComboBox comboBox=new ComboBox(FXCollections.observableArrayList(files));
     private ScrollPane child =new ScrollPane();
     private Set<Node> nodes;
     private Node bs=null;
@@ -50,7 +56,7 @@ public class Display {
      * update(TimerTask where update done) happens.
      * @param primaryStage, Stage
      */
-    public void createGUI(Stage primaryStage,Button button){
+    public void createGUI(Stage primaryStage,Button start){
         root.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5 + 20,
                          Screen.getPrimary().getBounds().getHeight() * 0.5 +
                              20);
@@ -61,14 +67,25 @@ public class Display {
         agentList.setPrefSize(300,400);
         agentList.setLayoutX(Screen.getPrimary().getBounds().getWidth() * 0.5+30);
         agentList.setLayoutY(5);
-        button.setLayoutY(Screen.getPrimary().getBounds().getHeight() * 0.5+10);
-        button.setLayoutX((Screen.getPrimary().getBounds().getWidth() * 0.5 + 20)/2);
+        start.setLayoutY(Screen.getPrimary().getBounds().getHeight() * 0.5+10);
+        start.setLayoutX((Screen.getPrimary().getBounds().getWidth() * 0.5 + 20)/2);
         child.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         child.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         child.setLayoutX(5);
         child.setLayoutY(5);
-        root.getChildren().addAll(child,agentList,button);
+        root.getChildren().addAll(child,agentList,start);
         child.setContent(pane);
+        Scene scene=new Scene(root);
+        primaryStage.setResizable(false);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    /**
+     * Adds the circles to the list and starts timers
+     * that will be updating the nodes on display.
+     */
+    public void start(){
         List<Shape> circleList=new ArrayList<>();
         List<Line> lineList=new ArrayList<>();
         addNodes(circleList);
@@ -83,12 +100,7 @@ public class Display {
             }
         },1,1);
         updateTable(timeline);
-        Scene scene=new Scene(root);
-        primaryStage.setResizable(false);
-        primaryStage.setScene(scene);
-        primaryStage.show();
     }
-
     /**
      * Goes through circle list and gets the node corresponding to
      * circle and checks its state, based off of what state and agent
