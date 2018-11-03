@@ -66,6 +66,8 @@ public class Coordinator extends Application {
      */
     @Override
     public void start(Stage primaryStage){
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Text Files","*.txt"));
         file=fileChooser.showOpenDialog(null);
         if(file==null){
             System.out.println("Nothing Chosen");
