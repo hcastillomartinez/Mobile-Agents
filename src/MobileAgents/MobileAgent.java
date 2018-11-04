@@ -137,8 +137,13 @@ public class MobileAgent implements SensorObject, Runnable {
      * @return string for the agent
      */
     public String toString() {
-        if(state()) return "" + this.getId() + " on " + this.currentNode.getName() + " State: Alive";
-        else return "" + this.getId() + " on " + this.currentNode.getName() + " State: Dead";
+        if(state()) {
+            return "" + this.getId() + " on " +
+                    this.currentNode.getName() + " State: Alive";}
+        else {
+            return "" + this.getId() + " on " +
+                    this.currentNode.getName() + " State: Dead";
+        }
     }
     
     /**
@@ -159,7 +164,7 @@ public class MobileAgent implements SensorObject, Runnable {
     
         while (this.alive) {
             present = System.currentTimeMillis();
-//            if (Math.abs(time - present) >= 600) {
+            if (Math.abs(time - present) >= 200) {
                 time = present;
 
                 if (this.walker) {
@@ -175,7 +180,7 @@ public class MobileAgent implements SensorObject, Runnable {
                     this.alive = false;
                 }
                 getMessages();
-//            }
+            }
         }
     }
 }
