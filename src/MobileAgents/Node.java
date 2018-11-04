@@ -60,7 +60,7 @@ public class Node implements SensorObject, Runnable {
         @Override
         public void run() {
             try {
-                Thread.sleep((new Random()).nextInt(5000) + 10000);
+                Thread.sleep((new Random()).nextInt(5000) + 5000);
                 this.node.setAgent(null);
                 this.node.setState("red");
                 
