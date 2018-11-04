@@ -26,22 +26,22 @@ Danan: Node, MobileAgent, Message, SensorObject, GraphReader
 
 Hector: Cooordinator, Display
 
-###Usage
+### Usage
 When program is run, user will be prompted to select a map text file. If no file is chosen program will close. Once file
 is selected GUI will launch and user must hit start button for simulation to begin. 
-###Project Assumptions
+### Project Assumptions
 Once base station catches on fire agent list printed in GUI will stop updating, since base station isn't able to 
 communicate. There is always only one base station and one fire. Mobile agents do not know fire exists so it just walks until
 it happens to find the fire.
-##Versions
+## Versions
 Jar is MobileAgents.jar and is in root directory.
-####V1
+#### V1
  Working version that fits specs.
- ##Docs
+ ## Docs
  Documentation is in Doc folder.
- ##Status
- ###Implemented Features
+ ## Status
+ ### Implemented Features
  Base station's agent list is printed on the GUI. Start button is present so that user can decide when to start simulation.
  FileChooser allows user to test any number of graphs.
- ###Known Issues
+ ### Known Issues
  Initial isn't represented on agent list.
