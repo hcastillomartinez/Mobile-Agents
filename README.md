@@ -37,11 +37,11 @@ it happens to find the fire.
 Jar is MobileAgents.jar and is in root directory.
 #### V1
  Working version that fits specs.
- ## Docs
+## Docs
  Documentation is in Doc folder.
- ## Status
- ### Implemented Features
+## Status
+### Implemented Features
  Base station's agent list is printed on the GUI. Start button is present so that user can decide when to start simulation.
  FileChooser allows user to test any number of graphs.
- ### Known Issues
+### Known Issues
  Initial isn't represented on agent list.
