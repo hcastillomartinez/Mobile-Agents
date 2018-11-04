@@ -8,18 +8,18 @@ package MobileAgents;
 public interface SensorObject {
     /**
      * Sending a message
-     * @return message for the node
+     * @param message the message to send
      */
     void sendMessage(Message message);
     
     /**
      * Getting the next message in the queue.
-     * @return message from the queue
      */
     void getMessages();
 
     /**
      * Function used for analyzing the messages
+     * @param message the message to analyze
      */
     void analyzeMessage(Message message);
 

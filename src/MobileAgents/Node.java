@@ -93,6 +93,7 @@ public class Node implements SensorObject, Runnable {
     
     /**
      * Setting the node ID.
+     * @param id, id of the node
      */
     public void setNodeIDForAgent(int id) { this.nodeID = id; }
     
@@ -173,6 +174,7 @@ public class Node implements SensorObject, Runnable {
     /**
      * Returning the agent on the node.
      * @param mobileAgent, mobile agent from this node
+     * @return boolean, false if not set, true otherwise
      */
     public synchronized boolean setAgent(MobileAgent mobileAgent) {
         if (this.agent == null) {
@@ -289,6 +291,7 @@ public class Node implements SensorObject, Runnable {
     
     /**
      * Sending the cloned mobile agent information home to the base station.
+     * @param message, message
      */
     private synchronized void sendCloneHome(Message message) {
         if (this.isBaseStation() &&
@@ -373,6 +376,7 @@ public class Node implements SensorObject, Runnable {
     
     /**
      * Creating the new state for the node
+     * @param node, node to scan
      */
     private synchronized void makeNewState(Node node) {
         if (node.getState().equalsIgnoreCase("blue")) {
@@ -382,6 +386,7 @@ public class Node implements SensorObject, Runnable {
     
     /**
      * Checking the state of the node
+     * @param sensorObject, checking the state of the sensor object
      */
     private synchronized void checkState(SensorObject sensorObject) {
         if (state.equalsIgnoreCase("blue")) {
@@ -411,7 +416,7 @@ public class Node implements SensorObject, Runnable {
     
     /**
      * Sending a message to update/perform a task.
-     * @param message, message
+     * @param message, message to put in the queue
      */
     @Override
     public void sendMessage(Message message) {
@@ -424,7 +429,6 @@ public class Node implements SensorObject, Runnable {
     
     /**
      * Getting a message from the queue to perform a task.
-     * sync
      */
     @Override
     public void getMessages() {

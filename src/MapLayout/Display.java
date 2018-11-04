@@ -54,6 +54,7 @@ public class Display {
     /**
      * Sets the Nodes(JavaFx.Scene) on the stage passed in. Where
      * update(TimerTask where update done) happens.
+     * @param start the start button for the program
      * @param primaryStage, Stage
      */
     public void createGUI(Stage primaryStage,Button start){

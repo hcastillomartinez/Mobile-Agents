@@ -62,7 +62,7 @@ public class Coordinator extends Application {
     /**
      * As program is launched Display sets everything
      * and simulation is started.
-     * @param primaryStage
+     * @param primaryStage the stage to draw the objects on
      */
     @Override
     public void start(Stage primaryStage){
