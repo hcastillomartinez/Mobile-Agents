@@ -446,7 +446,6 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void analyzeMessage(Message message) {
         String messageString = message.getDetailedMessage();
-        System.out.println(message.toString());
         
         if (messageString.equalsIgnoreCase("is agent present")) {
             checkNodeForRandomWalk(message);
