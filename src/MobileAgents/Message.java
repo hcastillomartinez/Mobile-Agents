@@ -68,7 +68,7 @@ public class Message {
      * Returning the node who gets the message.
      * @return receiver, who gets the message
      */
-    public SensorObject getReceiver() {
+    public synchronized SensorObject getReceiver() {
         return this.receiver;
     }
     

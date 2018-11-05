@@ -21,7 +21,7 @@ public class Node implements SensorObject, Runnable {
     private MobileAgent agent;
     private boolean baseStation, fireCountdownStarted = false;
     private int level;
-    
+
     /**
      * Constructor for the Node class.
      * @param queue, concurrent queue for storing events
@@ -63,21 +63,23 @@ public class Node implements SensorObject, Runnable {
                 Thread.sleep((new Random()).nextInt(5000) + 5000);
                 this.node.setAgent(null);
                 this.node.setState("red");
-                
                 for (Node n: this.node.getNeighbors()) {
                     if (!n.getState().equalsIgnoreCase("red")) {
                         n.sendMessage(new Message(this.node,
                                                   n,
                                                   null,
                                                   "update to new state"));
-                        if (n.agentPresent()) {
-                            n.getAgent().sendMessage(new Message(n,
-                                                                 n.getAgent(),
-                                                                 null,
-                                                                 "state changed"));
-                        }
+                    }
+
+                    if (n.agentPresent()) {
+                        n.getAgent().sendMessage(new Message(n,
+                                                             n.getAgent(),
+                                                             null,
+                                                             "state changed"));
                     }
                 }
+
+
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
@@ -159,9 +161,13 @@ public class Node implements SensorObject, Runnable {
     
     /**
      * Returning the status of the node.
-     * @return status, heat, of the node
+     * @return status, heat of the node
      */
-    public synchronized String getState() { return this.state; }
+    public String getState() {
+        synchronized (this.state) {
+            return this.state;
+        }
+    }
     
     /**
      * Setting the state of the node.
@@ -319,7 +325,7 @@ public class Node implements SensorObject, Runnable {
      * @param node, node to clone an agent on
      */
     private synchronized void clone(Node node) {
-        MobileAgent mobileAgent = new MobileAgent(new LinkedBlockingQueue<>(1),
+        MobileAgent mobileAgent = new MobileAgent(new LinkedBlockingQueue<>(),
                                                   node.getNodeID(),
                                                   node,
                                                   false,
@@ -366,11 +372,11 @@ public class Node implements SensorObject, Runnable {
      * Updating the state of the node
      */
     private synchronized void updateState() {
-        if (this.getState().equalsIgnoreCase("yellow") &&
+        if (this.state.equalsIgnoreCase("yellow") &&
             !this.fireCountdownStarted) {
+            this.fireCountdownStarted = true;
             FinalMessage finalMessage = new FinalMessage(this);
             finalMessage.start();
-            this.fireCountdownStarted = true;
         }
     }
     
@@ -446,17 +452,13 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void analyzeMessage(Message message) {
         String messageString = message.getDetailedMessage();
-        
+
         if (messageString.equalsIgnoreCase("is agent present")) {
             checkNodeForRandomWalk(message);
         } else if (messageString.equalsIgnoreCase("clone")) {
             cloneAgents();
         } else if (messageString.equalsIgnoreCase("send clone home")) {
             sendCloneHome(message);
-        } else if (messageString.equalsIgnoreCase("remove clone")) {
-            sendCloneHome(message);
-        } else if (messageString.equalsIgnoreCase("check state")) {
-            checkState(message.getSender());
         } else if (messageString.equalsIgnoreCase("update to new state")) {
             makeNewState((Node) message.getReceiver());
         }

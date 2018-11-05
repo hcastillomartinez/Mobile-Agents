@@ -45,18 +45,6 @@ public class MobileAgent implements SensorObject, Runnable {
     }
 
     /**
-     * Checks the state of the node that it sits on
-     * if red then returns true meaning it's dead.
-     * @return
-     */
-    private boolean state(){
-        if(!this.currentNode.getState().equals("red")){
-            return true;
-        }
-        else return false;
-    }
-
-    /**
      * Returning the id of the agent.
      * @return id, unique id of the agent
      */
@@ -136,8 +124,8 @@ public class MobileAgent implements SensorObject, Runnable {
      * Overriding toString() to print out the agent.
      * @return string for the agent
      */
-    public String toString() {
-        if(state()) {
+    public synchronized String toString() {
+        if(!this.currentNode.getState().equalsIgnoreCase("red")) {
             return "" + this.getId() + " on " +
                     this.currentNode.getName() + " State: Alive";}
         else {
