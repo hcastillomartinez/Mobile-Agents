@@ -42,7 +42,7 @@ public class GraphReader {
             fireX = 0, fireY = 0;
         
         try {
-            scanner = new Scanner(this.file);
+            scanner = new Scanner(file);
             while (scanner.hasNext()) {
                 nextLine = scanner.next();
                 nodeX = scanner.nextInt();
@@ -56,17 +56,17 @@ public class GraphReader {
     
                 // checking next line string
                 if (nextLine.equalsIgnoreCase("station") &&
-                    !this.baseStationAssigned) {
+                    !baseStationAssigned) {
                     stationX = nodeX;
                     stationY = nodeY;
-                    this.baseStationAssigned = true;
+                    baseStationAssigned = true;
                 } else if (nextLine.equalsIgnoreCase("node")) {
                     placeNodeInGraph(makeNodeName(nodeX, nodeY), nodeX, nodeY);
                 } else if (nextLine.equalsIgnoreCase("fire") &&
-                    !this.fireStarted) {
+                    !fireStarted) {
                     fireX = nodeX;
                     fireY = nodeY;
-                    this.fireStarted = true;
+                    fireStarted = true;
                 } else if (nextLine.equalsIgnoreCase("edge")) {
                     beginNode.push(makeNodeName(nodeX, nodeY));
                     endNode.push(makeNodeName(edgeX, edgeY));
@@ -90,7 +90,7 @@ public class GraphReader {
      */
     private void setNodeID() {
         int i = 1;
-        for (Node n: this.graph.keySet()) {
+        for (Node n: graph.keySet()) {
             n.setNodeIDForAgent(i);
             i++;
         }
@@ -103,7 +103,7 @@ public class GraphReader {
                                   int baseY,
                                   int fireStartX,
                                   int fireStartY) {
-        for (Node n: this.graph.keySet()) {
+        for (Node n: graph.keySet()) {
             if (n.retrieveName().equalsIgnoreCase(makeNodeName(baseX,
                                                                baseY))) {
                 n.setBaseStation();
@@ -125,7 +125,7 @@ public class GraphReader {
      */
     private void placeNodeInGraph(String name, int newNodeX, int newNodeY) {
         boolean inKeys = false;
-        for (Node n: this.graph.keySet()) {
+        for (Node n: graph.keySet()) {
             if (n.retrieveName().equalsIgnoreCase(name)) {
                 inKeys = true;
             }
@@ -133,11 +133,11 @@ public class GraphReader {
         
         if (!inKeys) {
             // look back here and check out the node for check time
-            this.graph.put(new Node(new LinkedBlockingQueue<>(),
-                                    newNodeX,
-                                    newNodeY,
-                                    "blue",
-                                    name),
+            graph.put(new Node(new LinkedBlockingQueue<>(),
+                               newNodeX,
+                               newNodeY,
+                               "blue",
+                               name),
                            new ArrayList<>());
         }
     }
@@ -147,7 +147,7 @@ public class GraphReader {
      */
     private void placeEdgesInGraph(String beginNodeName, String endNodeName) {
         Node startNode = null, connectingNode = null;
-        for (Node n: this.graph.keySet()) {
+        for (Node n: graph.keySet()) {
             if (n.retrieveName().equalsIgnoreCase(beginNodeName)) {
                 startNode = n;
             }
@@ -160,12 +160,12 @@ public class GraphReader {
         if (startNode != null && connectingNode != null) {
             if (!startNode.getNeighbors().contains(connectingNode)) {
                 startNode.getNeighbors().add(connectingNode);
-                this.graph.get(startNode).add(connectingNode);
+                graph.get(startNode).add(connectingNode);
             }
             
             if (!connectingNode.getNeighbors().contains(startNode)) {
                 connectingNode.getNeighbors().add(startNode);
-                this.graph.get(connectingNode).add(startNode);
+                graph.get(connectingNode).add(startNode);
             }
         }
     }
@@ -181,7 +181,7 @@ public class GraphReader {
      * Returning the built graph.
      * @return graph of the layout
      */
-    public HashMap<Node, ArrayList<Node>> getGraph() { return this.graph; }
+    public HashMap<Node, ArrayList<Node>> getGraph() { return graph; }
 
     /**
      * Continually checks the nodes for their level and until all levels have been
@@ -189,7 +189,7 @@ public class GraphReader {
      */
     private void setLevels(){
         while(levelDone()==false){
-            for(Node n: this.graph.keySet()){
+            for(Node n: graph.keySet()){
                 setChildrenLevel(n);
             }
         }
@@ -201,7 +201,7 @@ public class GraphReader {
      * @return Returns true when done
      */
     private boolean levelDone(){
-        for(Node n: this.graph.keySet()){
+        for(Node n: graph.keySet()){
             if(n.getLevel()==0 && !n.isBaseStation())return false;
         }
         return true;
