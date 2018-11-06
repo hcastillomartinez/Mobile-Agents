@@ -8,10 +8,8 @@ import MobileAgents.Node;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
@@ -22,7 +20,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
-import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -35,20 +32,17 @@ public class Display {
     private AnchorPane root=new AnchorPane();
     private Pane pane=new Pane();
     private ListView<String> agentList=new ListView<>();
-    private String files[]={"BaseStationCenter","BottleNeck","BowlSkew","GraphTest","GraphTestTwo",
-            "Star","VerticalHourGlass","VerticalHourGlassTwo"};
-//    private ComboBox comboBox=new ComboBox(FXCollections.observableArrayList(files));
     private ScrollPane child =new ScrollPane();
     private Set<Node> nodes;
     private Node bs=null;
     private boolean flag=false;
-    private Timeline timeline;
+    private Timeline timeLine;
     /**
      * Sets nodes to be Set passed in.
      * @param n, Set of Nodes
      */
     public Display(Set<Node> n){
-        this.nodes=n;
+        nodes=n;
     }
 
     /**
@@ -100,7 +94,7 @@ public class Display {
                 update(circleList);
             }
         },1,1);
-        updateTable(timeline);
+        updateTable(timeLine);
     }
     /**
      * Goes through circle list and gets the node corresponding to
@@ -111,13 +105,13 @@ public class Display {
     private void update(List<Shape> circleList){
         for(Shape circle: circleList) {
             if (circle.getId().equals("bs")) {
-                Node n=circleToNode(this.nodes,this.bs.retrieveName());
+                Node n=circleToNode(nodes,bs.retrieveName());
                 circle.setFill(Paint.valueOf(n.getState()));
                 if (n.getAgent() == null) {
                     circle.setStroke(Color.BLACK);
                 } else circle.setStroke(Color.GREEN);
             } else{
-                Node n = circleToNode(this.nodes, circle.getId());
+                Node n = circleToNode(nodes, circle.getId());
                 circle.setFill(Paint.valueOf(n.getState()));
                 if (n.getAgent() == null) {
                     circle.setStroke(Color.BLACK);
@@ -135,9 +129,9 @@ public class Display {
      */
     private synchronized void updateTable(Timeline timeline) {
         timeline=new Timeline(new KeyFrame(Duration.millis(1),e->{
-            if(this.flag==false && this.bs.getState().equals("red")){
-                this.agentList.getItems().add("Base Station is on fire.");
-                this.flag=true;
+            if(flag==false && bs.getState().equals("red")){
+                agentList.getItems().add("Base Station is on fire.");
+                flag=true;
             }
             else if(this.bs.mobileAgents().size()!=0 && flag==false){
                 this.agentList.getItems().clear();
@@ -172,7 +166,7 @@ public class Display {
         for(Iterator<Node> n=nodes.iterator();n.hasNext();){
             Node node=n.next();
             if(node.isBaseStation()){
-                this.bs=node;
+                bs=node;
                 Rectangle rect=new Rectangle(30,30,Color.valueOf(node.getState()));
                 rect.setStrokeWidth(3.5);
                 rect.setStroke(Color.BLACK);
@@ -220,7 +214,7 @@ public class Display {
     private void drawEdges(List<Shape> circleList, List<Line> lineList) {
         Circle circle1;
         Circle circle2;
-        for (Node node : this.nodes) { //keySet
+        for (Node node : nodes) { //keySet
             circle1 = (Circle)nodeToCircle(circleList, node.retrieveName());
             List<Node> neighbors = node.getNeighbors();
             for (Node n : neighbors) {

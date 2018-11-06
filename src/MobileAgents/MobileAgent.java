@@ -41,20 +41,20 @@ public class MobileAgent implements SensorObject, Runnable {
      * @param node to change to
      */
     public void setCurrentNode(Node node) {
-        this.currentNode = node;
+        currentNode = node;
     }
 
     /**
      * Returning the id of the agent.
      * @return id, unique id of the agent
      */
-    public long getId() { return this.id; }
+    public long getId() { return id; }
     
     /**
      * Setting the walker to stop walking.
      * sync
      */
-    private void setWalkerStatus() { this.walker = false; }
+    private void setWalkerStatus() { walker = false; }
 
     /**
      * Function to create the specified message.
@@ -65,16 +65,16 @@ public class MobileAgent implements SensorObject, Runnable {
         Message message;
         if (messageCode.equalsIgnoreCase("is agent status")) {
             message = new Message(this,
-                                  this.currentNode,
+                                  currentNode,
                                   this,
                                   messageCode);
         } else {
             message = new Message(this,
-                                  this.currentNode,
+                                  currentNode,
                                   null,
                                   messageCode);
         }
-        this.currentNode.sendMessage(message);
+        currentNode.sendMessage(message);
     }
 
     /**
@@ -89,7 +89,7 @@ public class MobileAgent implements SensorObject, Runnable {
         if (messageDetail.equalsIgnoreCase("agent present")) {
             createMessageForNode("is agent status");
         } else if (messageDetail.equalsIgnoreCase("dead")) {
-            this.alive = false;
+            alive = false;
         } else if (messageDetail.equalsIgnoreCase("state changed")) {
             createMessageForNode("clone");
         }
@@ -102,7 +102,7 @@ public class MobileAgent implements SensorObject, Runnable {
     @Override
     public void sendMessage(Message message) {
         try {
-            this.queue.put(message);
+            queue.put(message);
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
@@ -114,7 +114,7 @@ public class MobileAgent implements SensorObject, Runnable {
     @Override
     public void getMessages() {
         try {
-            analyzeMessage(this.queue.take());
+            analyzeMessage(queue.take());
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
@@ -125,12 +125,12 @@ public class MobileAgent implements SensorObject, Runnable {
      * @return string for the agent
      */
     public synchronized String toString() {
-        if(!this.currentNode.getState().equalsIgnoreCase("red")) {
+        if(!currentNode.getState().equalsIgnoreCase("red")) {
             return "" + this.getId() + " on " +
-                    this.currentNode.getName() + " State: Alive";}
+                    currentNode.getName() + " State: Alive";}
         else {
             return "" + this.getId() + " on " +
-                    this.currentNode.getName() + " State: Dead";
+                    currentNode.getName() + " State: Dead";
         }
     }
     
@@ -150,22 +150,22 @@ public class MobileAgent implements SensorObject, Runnable {
     public void run() {
         long time = System.currentTimeMillis(), present;
     
-        while (this.alive) {
+        while (alive) {
             present = System.currentTimeMillis();
             if (Math.abs(time - present) >= 200) {
                 time = present;
 
-                if (this.walker) {
-                    if (this.currentNode.getState().equalsIgnoreCase("yellow")) {
-                        if (this.walker) {
+                if (walker) {
+                    if (currentNode.getState().equalsIgnoreCase("yellow")) {
+                        if (walker) {
                             setWalkerStatus();
                         }
                         createMessageForNode("clone");
                     } else {
                         createMessageForNode("is agent present");
                     }
-                } else if (this.currentNode.getState().equalsIgnoreCase("red")) {
-                    this.alive = false;
+                } else if (currentNode.getState().equalsIgnoreCase("red")) {
+                    alive = false;
                 }
                 getMessages();
             }
