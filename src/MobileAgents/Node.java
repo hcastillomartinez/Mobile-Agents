@@ -61,11 +61,11 @@ public class Node implements SensorObject, Runnable {
         public void run() {
             try {
                 Thread.sleep((new Random()).nextInt(5000) + 5000);
-                this.node.setAgent(null);
-                this.node.setState("red");
-                for (Node n: this.node.getNeighbors()) {
+                node.setAgent(null);
+                node.setState("red");
+                for (Node n: node.getNeighbors()) {
                     if (!n.getState().equalsIgnoreCase("red")) {
-                        n.sendMessage(new Message(this.node,
+                        n.sendMessage(new Message(node,
                                                   n,
                                                   null,
                                                   "update to new state"));
@@ -97,26 +97,26 @@ public class Node implements SensorObject, Runnable {
      * Setting the node ID.
      * @param id, id of the node
      */
-    public void setNodeIDForAgent(int id) { this.nodeID = id; }
+    public void setNodeIDForAgent(int id) { nodeID = id; }
     
     /**
      * Returning the name of the node.
      * @return name of the node
      */
-    public String retrieveName() { return this.name; }
+    public String retrieveName() { return name; }
     
     /**
      * Returning the name of the node.
      * @return name of the node
      */
-    public String getName() { return this.name; }
+    public String getName() { return name; }
     
     /**
      * Sets level of a node
      * @param lvl, int that is level of node
      */
     public void setLevel(int lvl){
-        this.level=lvl;
+        level=lvl;
     }
     
     /**
@@ -124,26 +124,26 @@ public class Node implements SensorObject, Runnable {
      * @return Returns an int
      */
     public int getLevel() {
-        return this.level;
+        return level;
     }
     
     /**
      * Returning the list of the neighbor nodes.
      * @return neighbor list
      */
-    public List<Node> getNeighbors() { return this.neighbors; }
+    public List<Node> getNeighbors() { return neighbors; }
     
     /**
      * Returning the x value for the node.
      * @return x, for the node
      */
-    public int getX() { return this.x; }
+    public int getX() { return x; }
     
     /**
      * Returning the y value for the node.
      * @return y, for the node
      */
-    public int getY() { return this.y; }
+    public int getY() { return y; }
     
     /**
      * Returning if the current node is the base station
@@ -155,8 +155,8 @@ public class Node implements SensorObject, Runnable {
      * Setting the node to the base station when graph is being read in.
      */
     public void setBaseStation() {
-        this.baseStation = true;
-        this.agentList = new CopyOnWriteArrayList<>();
+        baseStation = true;
+        agentList = new CopyOnWriteArrayList<>();
     }
     
     /**
@@ -164,8 +164,8 @@ public class Node implements SensorObject, Runnable {
      * @return status, heat of the node
      */
     public String getState() {
-        synchronized (this.state) {
-            return this.state;
+        synchronized (state) {
+            return state;
         }
     }
     
@@ -174,7 +174,7 @@ public class Node implements SensorObject, Runnable {
      * @param stateSet, state of the node
      */
     public synchronized void setState(String stateSet) {
-        this.state = stateSet;
+        state = stateSet;
     }
     
     /**
@@ -183,12 +183,12 @@ public class Node implements SensorObject, Runnable {
      * @return boolean, false if not set, true otherwise
      */
     public synchronized boolean setAgent(MobileAgent mobileAgent) {
-        if (this.agent == null) {
-            this.agent = mobileAgent;
+        if (agent == null) {
+            agent = mobileAgent;
             return true;
         } else {
             if (mobileAgent == null) {
-                this.agent = null;
+                agent = null;
                 return true;
             }
             return false;
@@ -199,26 +199,26 @@ public class Node implements SensorObject, Runnable {
      * Returning the mobile agent on the node.
      * @return mobile agent on the node
      */
-    public synchronized MobileAgent getAgent() { return this.agent; }
+    public synchronized MobileAgent getAgent() { return agent; }
     
     /**
      * Returning the list of the agents from the base station.
      * @return list of agents from the base station
      */
-    public synchronized List<MobileAgent> mobileAgents() { return this.agentList; }
+    public synchronized List<MobileAgent> mobileAgents() { return agentList; }
     
     /**
      * Returning the nodeID for creating mobile agent uniqueness.
      * @return nodeID, long node id
      */
-    public long getNodeID() { return (long) this.nodeID;}
+    public long getNodeID() { return (long) nodeID;}
     
     /**
      * Returning the status of whether the node has an agent present.
      * @return agentPresent, true if there is an agent and false otherwise
      */
     private synchronized boolean agentPresent() {
-        if (this.agent == null) {
+        if (agent == null) {
             return false;
         }
         return true;
@@ -239,11 +239,11 @@ public class Node implements SensorObject, Runnable {
         Message messageToSend;
         Random random = new Random();
         MobileAgent mobileAgent = (MobileAgent) message.getSender();
-        int nodePosition = random.nextInt(this.getNeighbors().size());
-        Node node = this.getNeighbors().get(nodePosition);
+        int nodePosition = random.nextInt(getNeighbors().size());
+        Node node = getNeighbors().get(nodePosition);
         
         if (node.setAgent(mobileAgent)) {
-            this.agent = null;
+            agent = null;
             mobileAgent.setCurrentNode(node);
             messageToSend = new Message(node,
                                         mobileAgent,
@@ -265,8 +265,8 @@ public class Node implements SensorObject, Runnable {
      * @return lowest ranked neighbor
      */
     private synchronized Node getLowestRankedNode(Message message) {
-        for (Node n: this.neighbors) {
-            if (n.getLevel() < this.level) {
+        for (Node n: neighbors) {
+            if (n.getLevel() < level) {
                 if (!n.getState().equalsIgnoreCase("red")) {
                     if (!message.getLowerRankedNodes().contains(n)) {
                         return n;
@@ -275,8 +275,8 @@ public class Node implements SensorObject, Runnable {
             }
         }
         
-        for (Node n: this.neighbors) {
-            if (n.getLevel() >= this.level) {
+        for (Node n: neighbors) {
+            if (n.getLevel() >= level) {
                 if (!n.getState().equalsIgnoreCase("red")) {
                     if (!message.getLowerRankedNodes().contains(this)) {
                         message.getLowerRankedNodes().addLast(this);
@@ -300,11 +300,11 @@ public class Node implements SensorObject, Runnable {
      * @param message, message
      */
     private synchronized void sendCloneHome(Message message) {
-        if (this.isBaseStation() &&
+        if (isBaseStation() &&
             !getState().equalsIgnoreCase("red")) {
             if (message.getDetailedMessage().equalsIgnoreCase("send clone home")) {
-                if (!this.agentList.contains(message.getClonedAgent())) {
-                    this.agentList.add(message.getClonedAgent());
+                if (!agentList.contains(message.getClonedAgent())) {
+                    agentList.add(message.getClonedAgent());
                 }
             }
         } else {
@@ -345,9 +345,9 @@ public class Node implements SensorObject, Runnable {
     private void cloneAgents() {
         sendMessage(new Message(this,
                                 this,
-                                this.agent,
+                                agent,
                                 "send clone home"));
-        for (Node n: this.getNeighbors()) {
+        for (Node n: getNeighbors()) {
             if (!n.getState().equalsIgnoreCase("red") &&
                 !n.agentPresent()) {
                 clone(n);
@@ -372,9 +372,9 @@ public class Node implements SensorObject, Runnable {
      * Updating the state of the node
      */
     private synchronized void updateState() {
-        if (this.state.equalsIgnoreCase("yellow") &&
-            !this.fireCountdownStarted) {
-            this.fireCountdownStarted = true;
+        if (state.equalsIgnoreCase("yellow") &&
+            !fireCountdownStarted) {
+            fireCountdownStarted = true;
             FinalMessage finalMessage = new FinalMessage(this);
             finalMessage.start();
         }
@@ -387,29 +387,6 @@ public class Node implements SensorObject, Runnable {
     private synchronized void makeNewState(Node node) {
         if (node.getState().equalsIgnoreCase("blue")) {
             setState("yellow");
-        }
-    }
-    
-    /**
-     * Checking the state of the node
-     * @param sensorObject, checking the state of the sensor object
-     */
-    private synchronized void checkState(SensorObject sensorObject) {
-        if (state.equalsIgnoreCase("blue")) {
-            sensorObject.sendMessage(new Message(this,
-                                                 sensorObject,
-                                                 null,
-                                                 "state blue"));
-        } else if (state.equalsIgnoreCase("yellow")) {
-            sensorObject.sendMessage(new Message(this,
-                                                 sensorObject,
-                                                 null,
-                                                 "state yellow"));
-        } else {
-            sensorObject.sendMessage(new Message(this,
-                                                 sensorObject,
-                                                 null,
-                                                 "state red"));
         }
     }
     
@@ -427,7 +404,7 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void sendMessage(Message message) {
         try {
-            this.queue.put(message);
+            queue.put(message);
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
@@ -439,7 +416,7 @@ public class Node implements SensorObject, Runnable {
     @Override
     public void getMessages() {
         try {
-            analyzeMessage(this.queue.take());
+            analyzeMessage(queue.take());
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
@@ -469,14 +446,17 @@ public class Node implements SensorObject, Runnable {
      * @return name of this node
      */
     @Override
-    public String printOutName() { return this.getName(); }
+    public String printOutName() { return getName(); }
     
     /**
      * Performing a task on this specific thread.
      */
     @Override
     public void run() {
-        while(!this.state.equalsIgnoreCase("red")) {
+        if (isBaseStation() && agentList.isEmpty()) {
+            agentList.add(agent);
+        }
+        while(!state.equalsIgnoreCase("red")) {
             updateState();
             getMessages();
         }

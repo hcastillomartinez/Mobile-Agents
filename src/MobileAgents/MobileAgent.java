@@ -12,7 +12,7 @@ public class MobileAgent implements SensorObject, Runnable {
     
     private BlockingQueue<Message> queue;
     private long id;
-    private Node currentNode;
+    private Node currentNode, nodeCreationPoint;
     private boolean walker, alive;
     
     /**
@@ -31,6 +31,7 @@ public class MobileAgent implements SensorObject, Runnable {
         this.queue = queue;
         this.id = id;
         this.currentNode = currentNode;
+        this.nodeCreationPoint = currentNode;
         this.walker = walker;
         this.alive = alive;
     }
@@ -126,11 +127,11 @@ public class MobileAgent implements SensorObject, Runnable {
      */
     public synchronized String toString() {
         if(!currentNode.getState().equalsIgnoreCase("red")) {
-            return "" + this.getId() + " on " +
-                    currentNode.getName() + " State: Alive";}
+            return "Agent: " + getId() + " from Node: " +
+                nodeCreationPoint.getName() + ", State: Alive";}
         else {
-            return "" + this.getId() + " on " +
-                    currentNode.getName() + " State: Dead";
+            return "Agent: " + getId() + " from Node: " +
+                nodeCreationPoint.getName() + ", State: Dead";
         }
     }
     

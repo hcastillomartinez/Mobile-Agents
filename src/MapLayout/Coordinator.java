@@ -37,8 +37,11 @@ public class Coordinator extends Application {
     private void beginSim(){
         for (Node n: map.keySet()) {
             if (n.isBaseStation()) {
-                BlockingQueue<Message> queue = new LinkedBlockingQueue<>(1);
-                long id = (new Random()).nextLong();
+                BlockingQueue<Message> queue = new LinkedBlockingQueue<>();
+                long id = 0;
+                for (Node node: map.keySet()) {
+                    id += node.getNodeID();
+                }
                 MobileAgent mobileAgent = new MobileAgent(queue,
                                                           Math.abs(id),
                                                           n,
