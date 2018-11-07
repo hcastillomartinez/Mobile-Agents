@@ -441,6 +441,7 @@ public class Node implements SensorObject, Runnable {
         }
     }
     
+    
     /**
      * Printing out the name of this node.
      * @return name of this node
