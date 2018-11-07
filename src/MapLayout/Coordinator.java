@@ -80,7 +80,7 @@ public class Coordinator extends Application {
             gr = new GraphReader(file);
             map = gr.getGraph();
             display = new Display(map.keySet());
-            display.createGUI(primaryStage,start);
+            display.createGUI(primaryStage,start,gr.greatestX(),gr.greatestY());
             display.start();
             start.setOnMousePressed(e -> {
                 if (started == false) {

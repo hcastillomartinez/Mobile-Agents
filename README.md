@@ -24,7 +24,7 @@ neighbors. No two agents can coexist an a single a node. Mobile agent dies when 
 ### Contributions
 Danan: Node, MobileAgent, Message, SensorObject, GraphReader
 
-Hector: Cooordinator, Display
+Hector: Coordinator, Display
 
 ### Usage
 When program is run, user will be prompted to select a map text file. If no file is chosen program will close. Once file

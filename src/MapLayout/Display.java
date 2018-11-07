@@ -51,12 +51,11 @@ public class Display {
      * @param start the start button for the program
      * @param primaryStage, Stage
      */
-    public void createGUI(Stage primaryStage,Button start){
+    public void createGUI(Stage primaryStage,Button start,int x,int y){
         root.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5 + 20,
                          Screen.getPrimary().getBounds().getHeight() * 0.5 +
                              20);
-        pane.setPrefSize(Screen.getPrimary().getBounds().getWidth()*.8,
-                Screen.getPrimary().getBounds().getHeight()*.8);
+        pane.setPrefSize(x*55,y*100);
         child.setPrefSize(Screen.getPrimary().getBounds().getWidth() * 0.5,
                           Screen.getPrimary().getBounds().getHeight() * 0.5);
         agentList.setPrefSize(300,400);
@@ -133,10 +132,10 @@ public class Display {
                 agentList.getItems().add("Base Station is on fire.");
                 flag=true;
             }
-            else if(this.bs.mobileAgents().size()!=0 && flag==false){
-                this.agentList.getItems().clear();
-                for(MobileAgent m:this.bs.mobileAgents()){
-                    this.agentList.getItems().add(m.toString());
+            else if(bs.mobileAgents().size()!=0 && flag==false){
+                agentList.getItems().clear();
+                for(MobileAgent m:bs.mobileAgents()){
+                    agentList.getItems().add(m.toString());
                 }
             }
         }));

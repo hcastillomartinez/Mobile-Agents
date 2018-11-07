@@ -184,6 +184,36 @@ public class GraphReader {
     public HashMap<Node, ArrayList<Node>> getGraph() { return graph; }
 
     /**
+     * Used to find the greatest x in the graph.
+     * @return Returns an int.
+     */
+    public int greatestX(){
+        int x=0;
+        for(Node n:graph.keySet()){
+            if(x<n.getX()){
+                x=n.getX();
+            }
+        }
+        return x;
+    }
+
+    /**
+     * Used to find the greatest y in the graph.
+     * @return Returns an int.
+     */
+    public int greatestY(){
+        int y=0;
+        for(Node n:graph.keySet()){
+            if(y<n.getY()){
+                y=n.getY();
+            }
+        }
+        return y;
+    }
+
+
+
+    /**
      * Continually checks the nodes for their level and until all levels have been
      * set is when it stops.
      */
