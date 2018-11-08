@@ -36,24 +36,46 @@ public class GraphReader {
      * Function to build the graph from the text file.
      */
     private void readInGraph() {
-        Scanner scanner;
-        String nextLine;
+        Scanner scanner, fileTestScanner;
+        String nextLine, testLine;
         int nodeX, nodeY, edgeX = 0, edgeY = 0, stationX = 0, stationY = 0,
-            fireX = 0, fireY = 0;
+            fireX = 0, fireY = 0, nonSpecWords = 0, stationNumber = 0,
+                fireNumber = 0;
         
         try {
+            fileTestScanner = new Scanner(file);
+            while (fileTestScanner.hasNext()) {
+                testLine = fileTestScanner.next();
+                if (!testLine.equals("edge") || !testLine.equals("node") ||
+                        !testLine.equals("fire") || !testLine.equals("station")) {
+                    nonSpecWords++;
+                }
+
+                if (fileTestScanner.equals("station")) {
+                    stationNumber++;
+                }
+
+                if (fileTestScanner.equals("fire")) {
+                    fireNumber++;
+                }
+            }
+            fileTestScanner.close();
+            if (stationNumber != 1 || fireNumber != 1 || nonSpecWords > 0) {
+                return;
+            }
+
             scanner = new Scanner(file);
             while (scanner.hasNext()) {
                 nextLine = scanner.next();
                 nodeX = scanner.nextInt();
                 nodeY = scanner.nextInt();
-               
+
                 // checking for edge ints
                 if (scanner.hasNextInt()) {
                     edgeX = scanner.nextInt();
                     edgeY = scanner.nextInt();
                 }
-    
+
                 // checking next line string
                 if (nextLine.equalsIgnoreCase("station") &&
                     !baseStationAssigned) {
