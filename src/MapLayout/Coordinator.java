@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -21,6 +22,7 @@ public class Coordinator extends Application {
     private FileChooser fileChooser=new FileChooser();
     private ArrayList<Thread> threads = new ArrayList<>();
     private File file=null;
+    int choice;
     private GraphReader gr;
     private HashMap<Node, ArrayList<Node>> map;
     private Button start=new Button("Start");
@@ -59,6 +61,20 @@ public class Coordinator extends Application {
         }
     }
 
+    private boolean validGraph(Set<Node> nodes){
+        boolean bs=false;
+        boolean fire=false;
+        for(Node n: nodes){
+            if(n.isBaseStation())bs=true;
+            if(n.getState().equals("red"))fire=true;
+        }
+        if(bs && fire){
+            return true;
+        }
+        else return false;
+    }
+
+
     /**
      * As program is launched Display sets everything
      * and simulation is started.
@@ -70,22 +86,24 @@ public class Coordinator extends Application {
                 new FileChooser.ExtensionFilter("Text Files","*.txt"));
         file=fileChooser.showOpenDialog(null);
         if(file==null){
-            System.out.println("Nothing Chosen");
             System.exit(0);
         }
-        else {
-            gr = new GraphReader(file);
-            map = gr.getGraph();
-            display = new Display(map.keySet());
-            display.createGUI(primaryStage,start,gr.greatestX(),gr.greatestY());
-            display.start();
-            start.setOnMousePressed(e -> {
-                if (started == false) {
-                    beginSim();
-                    started = true;
-                }
-            });
+        gr = new GraphReader(file);
+        map = gr.getGraph();
+        if(!validGraph(map.keySet())){
+            System.out.println("adasd");
+            System.out.println("not valid");
+            System.exit(0);
         }
+        display = new Display(map.keySet());
+        display.createGUI(primaryStage,start,gr.greatestX(),gr.greatestY());
+        display.start();
+        start.setOnMousePressed(e -> {
+            if (started == false) {
+                beginSim();
+                started = true;
+            }
+        });
     }
 
     /**

@@ -46,8 +46,8 @@ public class GraphReader {
             fileTestScanner = new Scanner(file);
             while (fileTestScanner.hasNext()) {
                 testLine = fileTestScanner.next();
-                if (!testLine.equals("edge") || !testLine.equals("node") ||
-                        !testLine.equals("fire") || !testLine.equals("station")) {
+                if (!testLine.equals("edge") && !testLine.equals("node") &&
+                        !testLine.equals("fire") && !testLine.equals("station")) {
                     nonSpecWords++;
                 }
 
@@ -60,9 +60,7 @@ public class GraphReader {
                 }
             }
             fileTestScanner.close();
-            if (stationNumber != 1 || fireNumber != 1 || nonSpecWords > 0) {
-                return;
-            }
+//            i
 
             scanner = new Scanner(file);
             while (scanner.hasNext()) {
@@ -100,8 +98,11 @@ public class GraphReader {
             }
             
             setStartingNodes(stationX, stationY, fireX, fireY);
-    
+
             scanner.close();
+            if(nonSpecWords > 0) {
+                return;
+            }
         } catch (FileNotFoundException fe) {
             fe.printStackTrace();
         }
