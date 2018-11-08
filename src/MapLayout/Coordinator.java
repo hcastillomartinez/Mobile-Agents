@@ -91,7 +91,6 @@ public class Coordinator extends Application {
         gr = new GraphReader(file);
         map = gr.getGraph();
         if(!validGraph(map.keySet())){
-            System.out.println("adasd");
             System.out.println("not valid");
             System.exit(0);
         }

@@ -28,80 +28,57 @@ public class GraphReader {
         this.file = file;
         this.graph = new HashMap<>();
         readInGraph();
-        setLevels();
-        setNodeID();
     }
     
     /**
      * Function to build the graph from the text file.
      */
     private void readInGraph() {
-        Scanner scanner, fileTestScanner;
-        String nextLine, testLine;
+        Scanner scanner;
+        String nextLine;
         int nodeX, nodeY, edgeX = 0, edgeY = 0, stationX = 0, stationY = 0,
-            fireX = 0, fireY = 0, nonSpecWords = 0, stationNumber = 0,
-                fireNumber = 0;
+            fireX = 0, fireY = 0;
         
         try {
-            fileTestScanner = new Scanner(file);
-            while (fileTestScanner.hasNext()) {
-                testLine = fileTestScanner.next();
-                if (!testLine.equals("edge") && !testLine.equals("node") &&
-                        !testLine.equals("fire") && !testLine.equals("station")) {
-                    nonSpecWords++;
+            if (checkGraph()) {
+                scanner = new Scanner(file);
+                while (scanner.hasNext()) {
+                    nextLine = scanner.next();
+                    nodeX = scanner.nextInt();
+                    nodeY = scanner.nextInt();
+
+                    // checking for edge ints
+                    if (scanner.hasNextInt()) {
+                        edgeX = scanner.nextInt();
+                        edgeY = scanner.nextInt();
+                    }
+
+                    // checking next line string
+                    if (nextLine.equalsIgnoreCase("station") &&
+                            !baseStationAssigned) {
+                        stationX = nodeX;
+                        stationY = nodeY;
+                        baseStationAssigned = true;
+                    } else if (nextLine.equalsIgnoreCase("node")) {
+                        placeNodeInGraph(makeNodeName(nodeX, nodeY), nodeX, nodeY);
+                    } else if (nextLine.equalsIgnoreCase("fire") &&
+                            !fireStarted) {
+                        fireX = nodeX;
+                        fireY = nodeY;
+                        fireStarted = true;
+                    } else if (nextLine.equalsIgnoreCase("edge")) {
+                        beginNode.push(makeNodeName(nodeX, nodeY));
+                        endNode.push(makeNodeName(edgeX, edgeY));
+                    }
                 }
 
-                if (fileTestScanner.equals("station")) {
-                    stationNumber++;
+                for (int i = 0; i < beginNode.size(); i++) {
+                    placeEdgesInGraph(beginNode.get(i), endNode.get(i));
                 }
 
-                if (fileTestScanner.equals("fire")) {
-                    fireNumber++;
-                }
-            }
-            fileTestScanner.close();
-//            i
+                setStartingNodes(stationX, stationY, fireX, fireY);
 
-            scanner = new Scanner(file);
-            while (scanner.hasNext()) {
-                nextLine = scanner.next();
-                nodeX = scanner.nextInt();
-                nodeY = scanner.nextInt();
-
-                // checking for edge ints
-                if (scanner.hasNextInt()) {
-                    edgeX = scanner.nextInt();
-                    edgeY = scanner.nextInt();
-                }
-
-                // checking next line string
-                if (nextLine.equalsIgnoreCase("station") &&
-                    !baseStationAssigned) {
-                    stationX = nodeX;
-                    stationY = nodeY;
-                    baseStationAssigned = true;
-                } else if (nextLine.equalsIgnoreCase("node")) {
-                    placeNodeInGraph(makeNodeName(nodeX, nodeY), nodeX, nodeY);
-                } else if (nextLine.equalsIgnoreCase("fire") &&
-                    !fireStarted) {
-                    fireX = nodeX;
-                    fireY = nodeY;
-                    fireStarted = true;
-                } else if (nextLine.equalsIgnoreCase("edge")) {
-                    beginNode.push(makeNodeName(nodeX, nodeY));
-                    endNode.push(makeNodeName(edgeX, edgeY));
-                }
-            }
-            
-            for (int i = 0; i < beginNode.size(); i++) {
-                placeEdgesInGraph(beginNode.get(i), endNode.get(i));
-            }
-            
-            setStartingNodes(stationX, stationY, fireX, fireY);
-
-            scanner.close();
-            if(nonSpecWords > 0) {
-                return;
+                scanner.close();
             }
         } catch (FileNotFoundException fe) {
             fe.printStackTrace();
@@ -117,6 +94,40 @@ public class GraphReader {
             n.setNodeIDForAgent(i);
             i++;
         }
+    }
+
+    private boolean checkGraph() {
+        Scanner fileTestScanner;
+        String testLine;
+        int nonSpecWords = 0, stationNumber = 0, fireNumber = 0;
+
+        try {
+            fileTestScanner = new Scanner(file);
+            while (fileTestScanner.hasNext()) {
+                testLine = fileTestScanner.next();
+                if (!testLine.equals("edge") && !testLine.equals("node") &&
+                        !testLine.equals("fire") && !testLine.equals("station")) {
+                    if (!testLine.matches("-?\\d+")) {
+                        nonSpecWords++;
+                    }
+                }
+
+                if (fileTestScanner.equals("station")) {
+                    stationNumber++;
+                }
+
+                if (fileTestScanner.equals("fire")) {
+                    fireNumber++;
+                }
+            }
+            fileTestScanner.close();
+        } catch (FileNotFoundException fe) {
+            fe.printStackTrace();
+        }
+        if (nonSpecWords != 0 && stationNumber != 1 && fireNumber != 1) {
+            return false;
+        }
+        return true;
     }
 
     /**
