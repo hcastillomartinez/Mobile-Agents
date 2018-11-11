@@ -78,6 +78,8 @@ public class GraphReader {
 
                 setStartingNodes(stationX, stationY, fireX, fireY);
 
+                setNodeID();
+                setLevels();
                 scanner.close();
             }
         } catch (FileNotFoundException fe) {
