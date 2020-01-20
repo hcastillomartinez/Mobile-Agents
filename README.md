@@ -1,6 +1,6 @@
 # Project: Mobile Agents
 
-## Students: Danan High, Hector Castillo Martinez
+## Collaborators: Danan High, Hector Castillo Martinez
 
 ### Introduction 
 Design a simulation that represents a wireless sensor network that upon discovery of a heated
